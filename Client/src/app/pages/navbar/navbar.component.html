@@ -1,0 +1,25 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <a routerLink="/" class="logo">
+      <img src="/logo12.png" class="logo-img" />
+    </a>
+    <ul class="nav-links">
+      <a routerLink="/">Home</a>
+
+      <!-- Announcements (dynamic navigation) -->
+      <a (click)="goToAnnouncements()">Announcements</a>
+
+      <!-- Authentication -->
+      <ng-container *ngIf="!user">
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register">Register</a>
+      </ng-container>
+
+      <!-- Logged-in user -->
+      <ng-container *ngIf="user">
+        <a (click)="goToProfile()">Profile</a>
+        <a (click)="logout()">Logout</a>
+      </ng-container>
+    </ul>
+  </div>
+</nav>

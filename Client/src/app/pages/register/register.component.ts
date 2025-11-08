@@ -41,8 +41,7 @@ export class RegisterComponent implements OnInit, OnChanges {
       lastName: ['', Validators.required],
       address: [''],
       phoneNumber: ['', Validators.pattern('^[0-9]*$')],
-      roleId: [2, Validators.required] ,// Setăm valoarea implicită 2,
-      profileImage: [null], // Adăugat controlul profileImage
+      roleId: [2, Validators.required] 
     });
 
     console.log("RegisterForm" + this.registerForm.controls); // Log pentru a verifica controlul
@@ -83,12 +82,12 @@ export class RegisterComponent implements OnInit, OnChanges {
 
   onSubmit(): void {
 
-    console.log('RegisterForme = ' + this.registerForm);
+    console.log('RegisterForm = ' + JSON.stringify(this.registerForm.value));
 
-    // if (this.registerForm.invalid) {
-    //   alert('Formular invalid. Te rugăm să verifici câmpurile.');
-    //   return;
-    // }
+    if (this.registerForm.invalid) {
+      alert('Formular invalid. Te rugăm să verifici câmpurile.');
+      return;
+    }
 
     const email = this.registerForm.get('emailAddress')?.value;
     const phoneNumber = this.registerForm.get('phoneNumber')?.value;
@@ -99,9 +98,7 @@ export class RegisterComponent implements OnInit, OnChanges {
     // Verificăm dacă utilizatorul există înainte de a continua
     this.authService.checkUserExistence(email, phoneNumber).subscribe(
       (response) => {
-        console.log('exist =', response.exist);
         if (response.exists) {
-          console.log('Mesaj= ' + response.message);
           alert(response.message); // Mesaj primit de la backend
         } else {
           this.processRegistration();
@@ -117,21 +114,18 @@ export class RegisterComponent implements OnInit, OnChanges {
 
   processRegistration(): void {
 
-    const formData = new FormData();
-    formData.append('Username', this.registerForm.get('username')?.value);
-    formData.append('EmailAddress', this.registerForm.get('emailAddress')?.value);
-    formData.append('Password', this.registerForm.get('password')?.value);
-    formData.append('FirstName', this.registerForm.get('firstName')?.value);
-    formData.append('LastName', this.registerForm.get('lastName')?.value);
-    formData.append('Address', this.registerForm.get('address')?.value);
-    formData.append('PhoneNumber', this.registerForm.get('phoneNumber')?.value);
-    formData.append('RoleId', this.registerForm.get('roleId')?.value);
+    const userData = {
+    username: this.registerForm.value.username,
+    email: this.registerForm.value.emailAddress,
+    password: this.registerForm.value.password,
+    firstName: this.registerForm.value.firstName,
+    lastName: this.registerForm.value.lastName,
+    address: this.registerForm.value.address,
+    phoneNumber: this.registerForm.value.phoneNumber,
+    roleId: this.registerForm.value.roleId
+  };
 
-    if (this.selectedFile) {
-      formData.append('ProfileImage', this.registerForm.get('profileImage')?.value);
-    }
-
-    this.authService.register(formData).subscribe(
+    this.authService.register(userData).subscribe(
       (response) => {
         alert('Utilizator înregistrat cu succes!');
         this.registerForm.reset();

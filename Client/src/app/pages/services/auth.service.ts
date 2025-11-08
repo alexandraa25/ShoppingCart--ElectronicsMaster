@@ -1,13 +1,16 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
-import { CheckUserModel } from '../models/check-user.model';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { LoginResponseModel } from '../models/login-response.model';
 
 @Injectable({
   providedIn: 'root', // Configurare pentru injectare globală
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7041/api/Register'; // Înlocuiește cu URL-ul backend-ului
+  private apiUrl = 'http://localhost:3000'; // Înlocuiește cu URL-ul backend-ului
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public user$ = this.currentUserSubject.asObservable();
+
 
   constructor(private http: HttpClient) {
     console.log('AuthService initialized!');
@@ -20,7 +23,7 @@ export class AuthService {
   confirmMail(token: string) {
 
     const url = `${this.apiUrl}/confirm-email?token=${encodeURIComponent(token)}}`;
-    console.log('URL:', url); 
+    console.log('URL:', url);
     return this.http.get<any>(url);
   }
 
@@ -29,22 +32,29 @@ export class AuthService {
     const params = new HttpParams()
       .set('email', email)
       .set('phoneNumber', phoneNumber);
-  
+
     return this.http.get<any>(url, { params });
   }
 
-  login(email: string, password: string): Observable<any> {
-    const url = `${this.apiUrl}/login`;
-    const params = new HttpParams()
-      .set('email', email)
-      .set('password', password);
-  
-    return this.http.get<any>(url, { params }).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.error('Login error:', error.message);
-        return throwError(() => new Error('Login failed'));
-      })
-    );
+  login(email: string, password: string) {
+    return this.http.post<LoginResponseModel>(`${this.apiUrl}/login`, { email, password });
+  }
+
+  logout(): void {
+    this.currentUserSubject.next(null);
+    localStorage.removeItem('token'); // ✅ corect
+  }
+
+  saveToken(token: string) {
+    localStorage.setItem("token", token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem("token");
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem("token");
   }
 
 }

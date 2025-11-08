@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -145,8 +146,13 @@
       border-radius: 10px;
       border: 1px solid #d1d5db;
     }
+
+    .full-width {
+  grid-column: 1 / 3;
+}
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
@@ -155,15 +161,15 @@
     <h2>Create an Account</h2>
     <p>Join us to explore amazing features and connect with the community.</p>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data" >
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
       <!-- Username and Email -->
       <div class="form-group">
         <i class="fas fa-user"></i>
-        <input type="text" formControlName="username"  placeholder="Username" required>
+        <input type="text" formControlName="username" placeholder="Username" required>
       </div>
       <div class="form-group">
         <i class="fas fa-envelope"></i>
-        <input type="email"  formControlName="emailAddress" placeholder="Email Address" required>
+        <input type="email" formControlName="emailAddress" placeholder="Email Address" required>
       </div>
 
       <!-- Password and First Name -->
@@ -181,20 +187,18 @@
         <i class="fas fa-id-badge"></i>
         <input type="text" formControlName="lastName" placeholder="Last Name" required>
       </div>
-      <div class="form-group">
-        <i class="fas fa-map-marker-alt"></i>
-        <input type="text" formControlName="address" placeholder="Address">
-      </div>
 
       <!-- Phone Number and Profile Image -->
       <div class="form-group">
         <i class="fas fa-phone"></i>
         <input type="text" formControlName="phoneNumber" placeholder="Phone Number">
       </div>
-      <div class="form-group">
-        <i class="fas fa-image"></i>
-        <input type="file"  formControlName="profileImage" accept="image/*">
+
+      <div class="form-group full-width">
+        <i class="fas fa-map-marker-alt"></i>
+        <input type="text" formControlName="address" placeholder="Address">
       </div>
+
       <!-- Checkbox -->
       <div class="checkbox-group">
         <input type="checkbox" id="terms" required>
@@ -222,4 +226,5 @@
     }
   </script> -->
 </body>
+
 </html>

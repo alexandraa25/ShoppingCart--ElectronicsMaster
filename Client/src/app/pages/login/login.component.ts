@@ -34,6 +34,9 @@ export class LoginComponent implements OnInit {
 
       this.authService.login(email, password).subscribe({
         next: (response) => {
+
+          this.authService.saveToken(response.token);
+
           this.snackBar.open('Autentificare reușită!', 'OK', {
             duration: 3000,
             horizontalPosition: 'center',
