@@ -1,0 +1,64 @@
+<app-popup-message
+  [isVisible]="popupVisible"
+  [title]="popupTitle"
+  [message]="popupMessage"
+  [isError]="popupIsError"
+  [confirmMode]="popupConfirmMode"
+  (close)="closePopup()"
+  (confirm)="deleteProductConfirmed()">
+</app-popup-message>
+<div class="product-list-container">
+
+    <!-- FILTERS -->
+    <div class="filters-container">
+        <input class="search-bar" type="text" [formControl]="searchControl" placeholder="🔍 Cauta un produs....." />
+
+        <select [formControl]="categoryControl">
+            <option value="">Toate categoriile</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+            </option>
+        </select>
+
+        <select [formControl]="sortByControl">
+            <option value="newest">Cele mai noi</option>
+            <option value="oldest">Cele mai vechi</option>
+        </select>
+    </div>
+
+    <!-- product LIST -->
+    <div class="product-grid">
+        <div class="product-card" *ngFor="let product of paginatedproducts">
+            <div class="product-info">
+                <div>
+                    <h3 class="name">{{ product.name }}</h3>
+                </div>
+                <div class="price">
+                    <p class="price" *ngIf="product.price"><i class="fa fa-coins"></i> {{ product.price }} lei</p>
+                </div>
+                <div class="product-actions">
+                    <button class="action-button view-button" (click)="viewproduct(product.id)">Vezi produs</button>
+                    <!-- <button class="action-button edit-button" style="margin-left: 20px;" *ngIf="isAdmin" (click)="editProduct(product.id)">Editeaza</button> -->
+                    <button class="action-button edit-button"  (click)="editProduct(product.id)"> Edit
+                    </button>
+                    <!-- <button class="action-button delete-button" *ngIf="isAdmin" (click)="confirmDeleteProduct(product.id)"> Șterge</button> -->
+                    <button class="action-button delete-button" (click)="confirmDeleteProduct(product.id)"> Șterge</button>
+
+                </div>
+
+            </div>
+            <div class="logo-wrapper" *ngIf="product.imageUrl">
+                <img [src]="product.imageUrl" alt="Product Image" />
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="previousPage()">‹ Previous</button>
+        <span>Pagina {{ currentPage }} din {{ totalPages }}</span>
+        <button [disabled]="currentPage === totalPages" (click)="nextPage()">Next ›</button>
+    </div>
+    
+</div>
+

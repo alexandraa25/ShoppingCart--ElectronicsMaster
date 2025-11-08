@@ -43,7 +43,9 @@ model Product {
   stock       Int
   categoryId  Int
   category    Category        @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]  // <--- Legătură one-to-many
+  images      ProductImage[]  
+  createdAt   DateTime        @default(now())   
+  updatedAt   DateTime        @default(now()) @updatedAt     
 }
 
 model ProductImage {
@@ -51,4 +53,22 @@ model ProductImage {
   url       String  // calea / URL-ul imaginii
   productId Int
   product   Product @relation(fields: [productId], references: [id])
+}
+
+model DeletedProduct {
+  id          Int             @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  stock       Int
+  categoryId  Int
+  deletedAt   DateTime        @default(now())
+  images      DeletedProductImage[]
+}
+
+model DeletedProductImage {
+  id              Int    @id @default(autoincrement())
+  url             String
+  deletedProductId Int
+  deletedProduct  DeletedProduct @relation(fields: [deletedProductId], references: [id])
 }

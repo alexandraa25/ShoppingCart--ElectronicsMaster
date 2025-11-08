@@ -24,6 +24,7 @@ export class ProductFormComponent implements OnInit {
   popupTitle = '';
   isEditMode: boolean = false;
   popupIsError = false;
+  existingImages: string[] = [];
 
   categories: any[] = [];
 
@@ -65,6 +66,7 @@ loadProductData(id: number): void {
         categoryId: product.categoryId
       });
 
+         this.existingImages = product.images.map(img => `http://localhost:3000${img.url}`);
       // ✅ imaginile vin tipate corect
      this.imagePreviews = product.images.map(img =>
   `http://localhost:3000${img.url}`
@@ -108,10 +110,18 @@ loadProductData(id: number): void {
     }
   }
 
-  removeImage(index: number): void {
-    this.selectedFiles.splice(index, 1);
-    this.imagePreviews.splice(index, 1);
-  }
+ removeImage(index: number): void {
+  const removedImage = this.imagePreviews[index];
+
+  // Dacă imaginea era în lista originală → o scoatem de acolo
+  this.existingImages = this.existingImages.filter(img => img !== removedImage);
+
+  // Scoatem și din preview
+  this.imagePreviews.splice(index, 1);
+
+  // Dacă era și fișier încărcat nou → îl scoatem din selectedFiles
+  this.selectedFiles.splice(index, 1);
+}
 
   loadCategories(): void {
     this.categoryService.getCategories().subscribe({
@@ -145,6 +155,9 @@ loadProductData(id: number): void {
 
     if (this.isEditMode) {
       const productId = Number(this.route.snapshot.queryParamMap.get('id'));
+      formData.append('existingImages', JSON.stringify(
+    this.existingImages.map(img => img.replace('http://localhost:3000', ''))
+  ));
       this.productService.updateProduct(productId, formData).subscribe({
         next: () => {
           this.showPopup('Succes', 'Produsul a fost actualizat!', false);

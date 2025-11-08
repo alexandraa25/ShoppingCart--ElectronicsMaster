@@ -13,18 +13,15 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-// Expunem folderul cu imaginile
 app.use("/uploads", express.static("uploads"));
 
 const JWT_SECRET = "eBf9$Z*V#y2^9GsJp3@fA6qL!xH4_TdQZp%78sX9Uv45";
 
-// Creăm folderul pentru imagini dacă nu există
 const uploadPath = "uploads/products";
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
-// Multer storage cu nume unic
 const storage = multer.diskStorage({
   destination: uploadPath,
   filename: (req, file, cb) => {
@@ -108,10 +105,27 @@ app.post("/categories", async (req, res) => {
 // ======================== PRODUCT CRUD ========================
 
 app.get("/products", async (req, res) => {
-  const products = await prisma.product.findMany({
-    include: { category: true, images: true }
-  });
-  res.json(products);
+  try {
+    const products = await prisma.product.findMany({
+      include: { images: true }
+    });
+
+    const formatted = products.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      categoryId: p.categoryId,
+      createdAt: p.createdAt,
+      imageUrl: p.images.length > 0 
+        ? `http://localhost:3000${p.images[0].url}`
+        : null
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Eroare la încărcarea produselor." });
+  }
 });
 
 app.post("/add-product", upload.array("images", 5), async (req, res) => {
@@ -184,7 +198,6 @@ app.put("/products/:id", upload.array("images", 5), async (req, res) => {
     const productId = Number(req.params.id);
     const { name, description, price, stock, categoryId, existingImages } = req.body;
 
-    // actualizare info produs
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
@@ -196,14 +209,12 @@ app.put("/products/:id", upload.array("images", 5), async (req, res) => {
       }
     });
 
-    // 1) Ștergere imagini unde nu mai apar în existingImages
     if (existingImages !== undefined) {
-      const keepUrls = JSON.parse(existingImages); // lista care rămâne
+      const keepUrls = JSON.parse(existingImages);
 
       const existing = await prisma.productImage.findMany({ where: { productId } });
 
       const toDelete = existing.filter(img => !keepUrls.includes(img.url));
-console.log('ToDelete ' + toDelete);
       for (const img of toDelete) {
         const filePath = path.join(process.cwd(), img.url.replace(/^\//, ''));
 
@@ -215,7 +226,6 @@ console.log('ToDelete ' + toDelete);
       }
     }
 
-    // 2) Adăugăm imaginile noi încărcate
     if (req.files?.length > 0) {
       await prisma.productImage.createMany({
         data: req.files.map(file => ({
@@ -225,7 +235,6 @@ console.log('ToDelete ' + toDelete);
       });
     }
 
-    // returnăm produsul actualizat cu toate imaginile rămase
     const finalProduct = await prisma.product.findUnique({
       where: { id: productId },
       include: { images: true, category: true }
@@ -238,6 +247,54 @@ console.log('ToDelete ' + toDelete);
     res.status(500).json({ error: "Eroare la actualizarea produsului." });
   }
 });
+
+app.delete("/products/:id", async (req, res) => {
+  const productId = Number(req.params.id);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+
+      const product = await tx.product.findUnique({
+        where: { id: productId },
+        include: { images: true }
+      });
+
+      if (!product) {
+        return res.status(404).json({ error: "Produsul nu există." });
+      }
+
+      // 1) Mutăm produsul în tabela DeletedProduct
+      const deleted = await tx.deletedProduct.create({
+        data: {
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          stock: product.stock,
+          categoryId: product.categoryId,
+          images: {
+            create: product.images.map(img => ({
+              url: img.url
+            }))
+          }
+        }
+      });
+
+      // 2) Ștergem doar înregistrările din produsele active
+      await tx.productImage.deleteMany({ where: { productId } });
+      await tx.product.delete({ where: { id: productId } });
+
+    });
+
+    res.json({ success: true, message: "Produsul a fost mutat în coșul șterse." });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Eroare la ștergerea (arhivarea) produsului." });
+  }
+});
+
+
+
 
 
 

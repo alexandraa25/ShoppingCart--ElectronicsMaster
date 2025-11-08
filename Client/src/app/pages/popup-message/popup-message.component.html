@@ -8,7 +8,12 @@
       <p>{{ message }}</p>
     </div>
     <div class="popup-footer">
-      <button (click)="closePopup()">OK</button>
+        <button *ngIf="!confirmMode" (click)="closePopup()">OK</button>
     </div>
+
+   <div *ngIf="confirmMode" class="confirm-buttons">
+    <button class="confirm-btn" (click)="confirm.emit()">Confirmă</button>
+    <button class="cancel-btn" (click)="closePopup()">Anulează</button>
+  </div>
   </div>
 </div>

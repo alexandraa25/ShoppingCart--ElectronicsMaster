@@ -15,6 +15,8 @@ export class PopupMessageComponent {
   @Input() isVisible: boolean = false; // Controls the visibility of the popup
 
   @Output() onClose = new EventEmitter<void>();
+  @Input() confirmMode = false;  // dacă true, afișăm două butoane
+@Output() confirm = new EventEmitter<void>();
 
   closePopup(): void {
     this.isVisible = false;
