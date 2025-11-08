@@ -1,0 +1,178 @@
+/* ===== LAYOUT GENERAL ===== */
+.admin-dashboard {
+  padding: 2rem;
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f8fafc;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-tabs {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 30px;
+  background: #111a2c;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.3);
+}
+
+/* ===== BARA DE TABURI ===== */
+.dashboard-tabs {
+  margin-top: 30px;
+  width: 100%;
+}
+
+/* containerul de taburi */
+.dashboard-tabs .mat-tab-labels {
+  justify-content: center !important;
+  gap: 1.6rem; /* mai mult spațiu între tab-uri */
+  padding: 0.8rem 0; /* înălțime mai mare a barei */
+}
+
+/* tab implicit */
+.dashboard-tabs .mat-tab-label {
+  background: #1b2a41;
+  border-radius: 14px; /* colțuri mai rotunjite */
+  padding: 14px 30px !important; /* TAB MULT MAI LAT */
+  color: #d1d9e6;
+  font-size: 17px; /* text mai mare */
+  font-weight: 500;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  transition: 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* icon mai mare */
+.tab-icon {
+  font-size: 20px;
+}
+
+/* hover stylish */
+.dashboard-tabs .mat-tab-label:hover {
+  background: #223652;
+  border-color: #facc15;
+  transform: translateY(-2px);
+}
+
+/* tab activ */
+.dashboard-tabs .mat-tab-label.mat-tab-label-active {
+  background: #facc15 !important;
+  color: #111 !important;
+  font-weight: 700;
+  border-color: #facc15;
+  box-shadow: 0px 0px 12px rgba(250, 204, 21, 0.45);
+}
+
+/* ascundere underline default */
+.dashboard-tabs .mat-ink-bar {
+  display: none !important;
+}
+/* ===== CONȚINUT TAB ===== */
+.tab-content-container {
+  margin-top: 20px;
+  background: #0d1524;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ===== LISTĂ UTILIZATORI ===== */
+.user-search input {
+  width: 260px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f8fafc;
+  margin-bottom: 18px;
+  outline: none;
+  transition: .2s;
+}
+.user-search input:focus {
+  border-color: #facc15;
+}
+
+/* tabel */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #111a2c;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.users-table thead {
+  background: #1e293b;
+  color: #facc15;
+}
+
+.users-table th,
+.users-table td {
+  padding: 13px 12px;
+  text-align: left;
+}
+
+.users-table tr:nth-child(even) {
+  background: #16233a;
+}
+
+.users-table tr:hover {
+  background: #1b2b47;
+}
+
+/* ===== BUTTONS ===== */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-suspend,
+.btn-activate,
+.btn-delete {
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+.btn-suspend { background: #f59e0b; color: #111; }
+.btn-suspend:hover { background: #d97706; }
+
+.btn-activate { background: #22c55e; color: #111; }
+.btn-activate:hover { background: #16a34a; }
+
+.btn-delete { background: #dc2626; color: #fff; }
+.btn-delete:hover { background: #b91c1c; }
+
+/* ===== PAGINARE ===== */
+.pagination-controls {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+}
+
+.pagination-controls button {
+  padding: 7px 14px;
+  background: #1e293b;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+.pagination-controls button:hover {
+  background: #2c3c55;
+}
+
+.pagination-controls span {
+  color: #facc15;
+  font-weight: 600;
+}

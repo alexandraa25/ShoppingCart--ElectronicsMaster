@@ -7,6 +7,7 @@ import fs from "fs";
 import multer from "multer";
 import path from "path";
 import crypto from "crypto";
+import session from "express-session";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -84,6 +85,75 @@ app.post("/login", async (req, res) => {
 app.get("/roles", async (req, res) => {
   const roles = await prisma.role.findMany();
   res.json(roles);
+});
+
+// ======================== GET ALL USERS ========================
+app.get("/users", async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,       
+        role: {
+          select: { name: true } // rolul (ex: admin, user)
+        }
+      }
+    });
+
+    res.json(users);
+  } catch (error) {
+    console.error("EROARE LA USERS: ", error);
+    res.status(500).json({ error: "Eroare la obținerea utilizatorilor." });
+  }
+});
+
+app.delete("/users/:id", async (req, res) => {
+  const userId = Number(req.params.id);
+
+  try {
+    await prisma.user.delete({
+      where: { id: userId }
+    });
+
+    res.json({ success: true, message: "Utilizator șters definitiv." });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Eroare la ștergerea utilizatorului." });
+  }
+});
+
+app.put("/users/:id/suspend", async (req, res) => {
+  const userId = Number(req.params.id);
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { status: "SUSPENDED" }
+    });
+
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Eroare la suspendarea utilizatorului." });
+  }
+});
+app.put("/users/:id/activate", async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { status: "ACTIVE" }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("EROARE ACTIVARE USER:", error);
+    res.status(500).json({ error: "Eroare la activarea utilizatorului." });
+  }
 });
 
 // ======================== CATEGORY CRUD ========================
@@ -295,8 +365,126 @@ app.delete("/products/:id", async (req, res) => {
 
 
 
+// ======================== COS ========================
+app.use(cors({
+  origin: "http://localhost:4200",
+  credentials: true
+}));
 
+app.use(session({
+  secret: "super_secret_key_schimba",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false
+  }
+}));
+function getCart(req) {
+  if (!req.session.cart) {
+    req.session.cart = { items: [], totalQty: 0, total: 0 }; 
+  }
+  return req.session.cart;
+}
 
+function recalc(cart) {
+  cart.totalQty = cart.items.reduce((s, it) => s + it.qty, 0);
+  cart.total = cart.items.reduce((s, it) => s + it.qty * it.price, 0);
+}
+// GET /cart – vezi coșul din sesiune
+app.get("/cart", (req, res) => {
+  const cart = getCart(req);
+  res.json(cart);
+});
+
+// POST /cart/add  { productId, qty }
+app.post("/cart/add", async (req, res) => {
+  try {
+    const { productId, qty = 1 } = req.body;
+    const id = Number(productId);
+    const count = Number(qty);
+
+    if (!id || count <= 0) return res.status(400).json({ error: "Date invalide." });
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: { images: true }
+    });
+    if (!product) return res.status(404).json({ error: "Produsul nu există." });
+    if (product.stock < count) return res.status(400).json({ error: "Stoc insuficient." });
+
+    const cart = getCart(req);
+    const existing = cart.items.find(i => i.productId === id);
+
+    if (existing) {
+      // poți limita la stoc
+      if (existing.qty + count > product.stock)
+        return res.status(400).json({ error: "Depășește stocul." });
+      existing.qty += count;
+    } else {
+      cart.items.push({
+        productId: id,
+        name: product.name,
+        price: product.price,
+        qty: count,
+        imageUrl: product.images?.[0]?.url ? `http://localhost:3000${product.images[0].url}` : null
+      });
+    }
+
+    recalc(cart);
+    res.json(cart);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Eroare la adăugare în coș." });
+  }
+});
+
+// PATCH /cart/update  { productId, qty }
+app.patch("/cart/update", async (req, res) => {
+  try {
+    const { productId, qty } = req.body;
+    const id = Number(productId);
+    const count = Number(qty);
+
+    if (!id || count < 0) return res.status(400).json({ error: "Date invalide." });
+
+    const cart = getCart(req);
+    const item = cart.items.find(i => i.productId === id);
+    if (!item) return res.status(404).json({ error: "Articol inexistent." });
+
+    if (count === 0) {
+      cart.items = cart.items.filter(i => i.productId !== id);
+    } else {
+      // verifică stoc actual
+      const product = await prisma.product.findUnique({ where: { id } });
+      if (!product) return res.status(404).json({ error: "Produsul nu există." });
+      if (count > product.stock) return res.status(400).json({ error: "Depășește stocul." });
+      item.qty = count;
+    }
+
+    recalc(cart);
+    res.json(cart);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Eroare la actualizare coș." });
+  }
+});
+
+// DELETE /cart/item/:productId
+app.delete("/cart/item/:productId", (req, res) => {
+  const id = Number(req.params.productId);
+  const cart = getCart(req);
+  cart.items = cart.items.filter(i => i.productId !== id);
+  recalc(cart);
+  res.json(cart);
+});
+
+// DELETE /cart – golește coșul
+app.delete("/cart", (req, res) => {
+  req.session.cart = { items: [], totalQty: 0, total: 0 };
+  res.json(req.session.cart);
+});
 
 // ======================== START SERVER ========================
 app.listen(3000, () =>

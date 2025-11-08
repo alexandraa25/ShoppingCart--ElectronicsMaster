@@ -11,11 +11,25 @@
       <ng-container *ngIf="!user">
         <a routerLink="/login">Login</a>
         <a routerLink="/register">Register</a>
+        <a routerLink="/cart" class="cart-link">
+          🛒 Coș <span class="cart-count" *ngIf="cartCount > 0">({{ cartCount }})</span>
+        </a>
+
       </ng-container>
 
       <ng-container *ngIf="user">
         <a (click)="goToProfile()">Profile</a>
         <a (click)="logout()">Logout</a>
+        <div class="nav-right">
+    <a routerLink="/cart" class="cart-link">
+      🛒 Coș
+      <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+    </a>
+
+    <a *ngIf="!user" routerLink="/login">Login</a>
+    <span *ngIf="user">Salut, {{ user?.name || user?.email }}</span>
+  </div>
+
       </ng-container>
     </ul>
   </div>

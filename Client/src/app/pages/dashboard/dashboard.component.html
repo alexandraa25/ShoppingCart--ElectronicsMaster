@@ -1,1 +1,96 @@
-<p>dashboard works!</p>
+<app-popup-message 
+  [isVisible]="popupVisible" 
+  [title]="popupTitle" 
+  [message]="popupMessage" 
+  [isError]="popupIsError"
+  [confirmMode]="popupConfirmMode" 
+  (close)="closePopup()" 
+  (confirm)="handleConfirm()">
+</app-popup-message>
+
+<div class="admin-dashboard">
+
+  <mat-tab-group mat-align-tabs="center" class="dashboard-tabs">
+
+    <!-- TAB 1: Adaugă produs -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-icon">➕</span> Adaugă produs nou
+      </ng-template>
+
+      <app-product-form></app-product-form>
+    </mat-tab>
+
+    <!-- TAB 2: Comenzi -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-icon">📦</span> Comenzi
+      </ng-template>
+
+      <div class="orders-placeholder">
+        <p>📦 Modulul de comenzi va fi adăugat în curând.</p>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 3: Utilizatori -->
+    <mat-tab>
+  <ng-template mat-tab-label>
+    <span class="tab-icon">👥</span> Utilizatori
+  </ng-template>
+
+  <div class="tab-content-container">
+
+    <div class="user-search">
+      <input type="text" placeholder="Caută utilizator..." [(ngModel)]="searchUserName" (input)="filterUsers()">
+    </div>
+
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nume utilizator</th>
+          <th>Email</th>
+          <th>Telefon</th>
+          <th>Creat la</th>
+          <th>Acțiuni</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let user of paginatedUsers">
+          <td>{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.phoneNumber || '-' }}</td>
+          <td>{{ user.createdAt | date:'mediumDate' }}</td>
+
+          <td class="action-buttons">
+
+            <button class="btn-suspend" *ngIf="user.status !== 'SUSPENDED'" (click)="confirmSuspendUser(user.id)">
+              ⛔ Suspend
+            </button>
+
+            <button class="btn-activate" *ngIf="user.status === 'SUSPENDED'" (click)="confirmActivateUser(user.id)">
+              ✅ Activează
+            </button>
+
+            <button class="btn-delete" (click)="confirmDeleteUser(user.id)">
+              🗑️ Șterge
+            </button>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-controls" *ngIf="totalUserPages > 1">
+      <button (click)="previousUserPage()" [disabled]="currentUserPage === 1">‹</button>
+      <span>Pagina {{ currentUserPage }} din {{ totalUserPages }}</span>
+      <button (click)="nextUserPage()" [disabled]="currentUserPage === totalUserPages">›</button>
+    </div>
+
+  </div>
+</mat-tab>
+
+  </mat-tab-group>
+</div>

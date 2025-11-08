@@ -63,7 +63,24 @@ export class AuthService {
 
   const payload = JSON.parse(atob(token.split('.')[1]));
   return payload.role ?? null;
+  
+ 
 }
 
+  getAllUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/users`);
+  }
+  // Suspendă utilizator
+  suspendUser(id: number) {
+    return this.http.put(`${this.apiUrl}/users/${id}/suspend`, {});
+  }
+
+  // Șterge utilizator (mutare în DeletedUser)
+  deleteUser(id: number) {
+    return this.http.delete(`${this.apiUrl}/users/${id}`);
+  }
+  activateUser(id: number) {
+  return this.http.put(`${this.apiUrl}/${id}/activate`, {});
+}
 
 }

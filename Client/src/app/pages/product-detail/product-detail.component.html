@@ -19,7 +19,19 @@
       <p class="category">Categorie: {{ product.category?.name }}</p>
       <p class="description">{{ product.description }}</p>
 
-      <button class="add-to-cart">Adaugă în coș</button>
+   <div class="quantity-add">
+  <div class="qty-controls">
+    <button (click)="changeQty(-1)">➖</button>
+    <span>{{ quantity }}</span>
+    <button (click)="changeQty(+1)">➕</button>
+  </div>
+
+  <button class="add-btn" (click)="addToCart(product)">Adaugă în coș</button>
+</div>
+
+ 
+
+
     </div>
 
   </div>

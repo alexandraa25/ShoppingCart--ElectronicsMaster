@@ -1,0 +1,46 @@
+<div class="cart-page">
+
+  <h1 class="title">🛒 Coșul tău</h1>
+
+  <div class="empty" *ngIf="cart.length === 0">
+    Coșul este gol.
+  </div>
+
+  <div class="cart-container" *ngIf="cart.length > 0">
+
+    <div class="cart-items">
+      <div class="cart-item" *ngFor="let item of cart">
+
+        <img class="item-img" *ngIf="item.imageUrl" [src]="item.imageUrl" />
+
+        <div class="item-info">
+          <h3>{{ item.name }}</h3>
+          <p class="price">{{ item.price | number:'1.2-2' }} lei</p>
+
+          <div class="qty-controls">
+            <button (click)="updateQuantity(item.id, -1)">−</button>
+            <span>{{ item.quantity }}</span>
+            <button (click)="updateQuantity(item.id, +1)">+</button>
+          </div>
+        </div>
+
+        <div class="item-total">
+          {{ item.price * item.quantity | number:'1.2-2' }} lei
+        </div>
+
+        <button class="remove-btn" (click)="removeItem(item.id)">✖</button>
+
+      </div>
+    </div>
+
+    <div class="cart-summary">
+      <h2>Total:</h2>
+      <p class="total">{{ total | number:'1.2-2' }} lei</p>
+
+      <button class="clear-btn" (click)="clear()">Golește coșul</button>
+      <button class="checkout-btn">Finalizează comanda</button>
+    </div>
+
+  </div>
+
+</div>

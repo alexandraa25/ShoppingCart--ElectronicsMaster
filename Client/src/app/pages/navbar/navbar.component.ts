@@ -1,32 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { jwtDecode } from 'jwt-decode';
-
+import { AuthService } from '../services/auth.service';
+import { CartService } from '../services/cart-service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: ['./navbar.component.css'] // <- corect
 })
-
 export class NavbarComponent implements OnInit {
   user: any;
+  cartCount = 0;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cart: CartService            // <- injecție corectă
+  ) {}
 
-  ngOnInit() {
-    this.authService.user$.subscribe(user => {
-      this.user = user;
-      
-      console.log('User from Navbar:', this.user);
-    });
+  ngOnInit(): void {
+    this.authService.user$.subscribe(u => this.user = u);
+    // ia valoarea curentă + actualizări
+    this.cart.cartCount$.subscribe(count => (this.cartCount = count));
   }
-  
 
+  
   logout() {
     this.authService.logout();
     window.location.href = '/login'; // Sau router.navigate
@@ -66,5 +67,9 @@ export class NavbarComponent implements OnInit {
 }
 
 
+}
+
+function jwtDecode(token: string): any {
+  throw new Error('Function not implemented.');
 }
 

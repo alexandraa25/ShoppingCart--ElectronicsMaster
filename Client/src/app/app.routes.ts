@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { AdminDashboardComponent } from './pages/dashboard/dashboard.component';
 import { RegisterComponent } from './pages/register/register.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(c => c.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register/register.component').then(c => c.RegisterComponent) },
-  { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(c => c.DashboardComponent) },
   { path: 'product-form', loadComponent: () => import('./pages/product-form/product-form.component').then(c => c.ProductFormComponent) },
   { path: 'product-list', loadComponent: () => import('./pages/product-list/product-list.component').then(c => c.productListComponent) },
   { path: 'product-detail', loadComponent: () => import('./pages/product-detail/product-detail.component').then(c => c.ProductDetailComponent) },
-
+  { path: 'admin-dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.AdminDashboardComponent)},
+    { path: 'cart', loadComponent: () => import('./pages/cart/cart.component').then(m => m.CartComponent)},
   { path: 'email-confirmation-register', loadComponent: () => import('./pages/email-confirmation-register/email-confirmation-register.component').then(c => c.EmailConfirmarionRegisterComponent) }
 ];
 

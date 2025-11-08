@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
           this.authService.saveToken(response.token);
 
           this.showPopup('', 'Autentificare reușită!', false);
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/product-list']);
         },
         error: (error) => {
           this.showPopup('', 'Email sau parolă incorecte!', false);
