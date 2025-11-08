@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up Form</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Reset și stiluri generale */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(to bottom, #1e293b, #0f172a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      color: #1f2937;
+    }
+
+    .header {
+      text-align: right;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    h2 {
+      color: #1f2937;
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 16px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .form-group input {
+      flex: 1;
+      padding: 18px 20px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 18px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #2563eb;
+    }
+
+    .form-group i {
+      color: #9ca3af;
+      font-size: 20px;
+    }
+
+    .form-group input::placeholder {
+      color: #9ca3af;
+    }
+
+    .full-width {
+      grid-column: 1 / 3;
+    }
+
+    .checkbox-group {
+      grid-column: 1 / 3;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      color: #6b7280;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      grid-column: 1 / 3;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #ef4444;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .btn-primary:hover {
+      background-color: #dc2626;
+    }
+
+    .privacy {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .privacy a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    #imagePreview {
+      display: none;
+      margin-top: 15px;
+      max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      Already have an account? <a href="#">Sign In</a>
+    </div>
+    <h2>Create an Account</h2>
+    <p>Join us to explore amazing features and connect with the community.</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data" >
+      <!-- Username and Email -->
+      <div class="form-group">
+        <i class="fas fa-user"></i>
+        <input type="text" formControlName="username"  placeholder="Username" required>
+      </div>
+      <div class="form-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email"  formControlName="emailAddress" placeholder="Email Address" required>
+      </div>
+
+      <!-- Password and First Name -->
+      <div class="form-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" formControlName="password" placeholder="Password" required>
+      </div>
+      <div class="form-group">
+        <i class="fas fa-id-card"></i>
+        <input type="text" formControlName="firstName" placeholder="First Name" required>
+      </div>
+
+      <!-- Last Name and Address -->
+      <div class="form-group">
+        <i class="fas fa-id-badge"></i>
+        <input type="text" formControlName="lastName" placeholder="Last Name" required>
+      </div>
+      <div class="form-group">
+        <i class="fas fa-map-marker-alt"></i>
+        <input type="text" formControlName="address" placeholder="Address">
+      </div>
+
+      <!-- Phone Number and Profile Image -->
+      <div class="form-group">
+        <i class="fas fa-phone"></i>
+        <input type="text" formControlName="phoneNumber" placeholder="Phone Number">
+      </div>
+      <div class="form-group">
+        <i class="fas fa-image"></i>
+        <input type="file"  formControlName="profileImage" accept="image/*">
+      </div>
+      <!-- Checkbox -->
+      <div class="checkbox-group">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</label>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-primary">Create Account</button>
+    </form>
+  </div>
+
+  <!-- <script>
+    function previewImage(event) {
+      const input = event.target;
+      const preview = document.getElementById('imagePreview');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+  </script> -->
+</body>
+</html>
