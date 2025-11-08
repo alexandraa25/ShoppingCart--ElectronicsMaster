@@ -36,9 +36,19 @@ model Category {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   name        String
+  description String
   price       Float
+  stock       Int
   categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category        @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]  // <--- Legătură one-to-many
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String  // calea / URL-ul imaginii
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
 }

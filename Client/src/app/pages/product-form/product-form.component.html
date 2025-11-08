@@ -1,0 +1,76 @@
+<app-popup-message [title]="popupTitle" [message]="popupMessage" [isError]="popupIsError" [isVisible]="popupVisible"
+    (onClose)="closePopup()">
+</app-popup-message>
+<div class="container">
+    <h2 class="form-title">Add an product</h2>
+    <div class="announcement-form-container">
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="form-grid">
+
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input id="name" formControlName="name" placeholder="e.g.: Cafea"
+                        [ngClass]="{ 'invalid-field': isInvalid('name') }" />
+                    <div *ngIf="isInvalid('name')"><small class="error-text">Name is required</small></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price *</label>
+                    <input id="price" formControlName="price" placeholder="e.g.: 300"
+                        [ngClass]="{ 'invalid-field': isInvalid('price') }" />
+                    <div *ngIf="isInvalid('price')"><small class="error-text">Price is required</small></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoryId">Category *</label>
+                    <select id="categoryId" formControlName="categoryId"
+                        [ngClass]="{ 'invalid-field': isInvalid('categoryId') }">
+                        <option value="">-- Select category --</option>
+                        <option *ngFor="let category of categories" [value]="category.id">
+                            {{ category.name }}
+                        </option>
+                    </select>
+                    <div *ngIf="isInvalid('categoryId')">
+                        <small class="error-text">Category is required</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Stock *</label>
+                    <input id="stock" formControlName="stock" placeholder="e.g.: 50"
+                        [ngClass]="{ 'invalid-field': isInvalid('stock') }" />
+                    <div *ngIf="isInvalid('stock')"><small class="error-text">Stock is required</small></div>
+                </div>
+
+                <div class="form-column">
+
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" formControlName="description" placeholder="More details"
+                            [ngClass]="{ 'invalid-field': isInvalid('description') }"></textarea>
+                        <div *ngIf="isInvalid('description')"><small class="error-text">This field is required</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Images (max 3)</label>
+                        <input type="file" multiple (change)="onFileSelected($event)" />
+                    </div>
+
+                    <div class="image-preview-wrapper">
+                        <div class="image-preview" *ngFor="let img of imagePreviews; let i = index">
+                            <img [src]="img" alt="Preview {{i}}">
+                            <button type="button" class="remove-image" (click)="removeImage(i)">×</button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-button">
+                            {{ isEditMode ? 'Update Product' : 'Add' }}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

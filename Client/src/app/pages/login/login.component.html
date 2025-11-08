@@ -96,6 +96,9 @@
   </style>
 </head>
 <body>
+    <app-popup-message [title]="popupTitle" [message]="popupMessage" [isError]="popupIsError" [isVisible]="popupVisible"
+  (onClose)="closePopup()">
+</app-popup-message>
   <div class="wrapper">
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <h2>Autentificare</h2>

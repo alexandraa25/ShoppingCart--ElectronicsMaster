@@ -3,21 +3,26 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import Swal from 'sweetalert2';
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PopupMessageComponent } from '../popup-message/popup-message.component';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PopupMessageComponent],
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService,private snackBar: MatSnackBar) {
+  popupTitle: string = '';
+  popupMessage: string = '';
+  popupIsError: boolean = false;
+  popupVisible: boolean = false;
+
+
+  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -37,30 +42,26 @@ export class LoginComponent implements OnInit {
 
           this.authService.saveToken(response.token);
 
-          this.snackBar.open('Autentificare reușită!', 'OK', {
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-            panelClass: ['white-snackbar'], // Stil personalizat
-          });
+          this.showPopup('', 'Autentificare reușită!', false);
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          this.snackBar.open('Email sau parolă incorecte!', 'Închide', {
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-            panelClass: ['white-snackbar'], // Stil personalizat
-          });
+          this.showPopup('', 'Email sau parolă incorecte!', false);
         },
       });
     } else {
-      this.snackBar.open('Vă rugăm să completați toate câmpurile.', 'OK', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'bottom',
-        panelClass: ['white-snackbar'], // Stil personalizat
-      });
+      this.showPopup('', 'Vă rugăm să completați toate câmpurile.', false);
     }
+  }
+
+  showPopup(title: string, message: string, isError: boolean): void {
+    this.popupTitle = title;
+    this.popupMessage = message;
+    this.popupIsError = isError;
+    this.popupVisible = true;
+  }
+
+  closePopup(): void {
+    this.popupVisible = false;
   }
 }

@@ -3,25 +3,30 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import { CheckUserModel } from '../models/check-user.model';
+import { PopupMessageComponent } from '../popup-message/popup-message.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule, PopupMessageComponent]
 })
 export class RegisterComponent implements OnInit, OnChanges {
   readonly userData = input<any>();
   registerForm!: FormGroup;
   selectedFile: File | null = null;
 
+  popupTitle: string = '';
+  popupMessage: string = '';
+  popupIsError: boolean = false;
+  popupVisible: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
@@ -32,19 +37,15 @@ export class RegisterComponent implements OnInit, OnChanges {
         [
           Validators.required,
           Validators.minLength(8),
-          Validators.pattern(
-            '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
-          ),
+          Validators.pattern( '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'),
         ],
       ],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       address: [''],
       phoneNumber: ['', Validators.pattern('^[0-9]*$')],
-      roleId: [2, Validators.required] 
+      roleId: [2, Validators.required]
     });
-
-    console.log("RegisterForm" + this.registerForm.controls); // Log pentru a verifica controlul
   }
 
   get isFormValid(): boolean {
@@ -74,7 +75,6 @@ export class RegisterComponent implements OnInit, OnChanges {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      console.log("Fișier selectat:", file);
       this.selectedFile = file;
       this.registerForm.get('profileImage')?.setValue(file);
     }
@@ -82,60 +82,66 @@ export class RegisterComponent implements OnInit, OnChanges {
 
   onSubmit(): void {
 
-    console.log('RegisterForm = ' + JSON.stringify(this.registerForm.value));
-
     if (this.registerForm.invalid) {
-      alert('Formular invalid. Te rugăm să verifici câmpurile.');
+      console.log('xx');
+      this.showPopup('Eroare', 'Formular invalid. Te rugăm să verifici câmpurile.', true);
       return;
     }
 
     const email = this.registerForm.get('emailAddress')?.value;
     const phoneNumber = this.registerForm.get('phoneNumber')?.value;
-    console.log('Email = ', email);
-    console.log('PhoneNumber = ', phoneNumber);
-    const checkUserModel = new CheckUserModel(email, phoneNumber);
 
-    // Verificăm dacă utilizatorul există înainte de a continua
     this.authService.checkUserExistence(email, phoneNumber).subscribe(
       (response) => {
         if (response.exists) {
-          alert(response.message); // Mesaj primit de la backend
+          this.showPopup('Eroare', response.message, true);
         } else {
           this.processRegistration();
         }
       },
       (error) => {
-        console.error('Eroare la verificarea utilizatorului:', error);
-        alert('A apărut o eroare. Te rugăm să încerci din nou.');
+        this.showPopup('Eroare', 'Eroare la verificarea utilizatorului.', true);
+        return;
       }
     );
   }
-    
 
   processRegistration(): void {
 
     const userData = {
-    username: this.registerForm.value.username,
-    email: this.registerForm.value.emailAddress,
-    password: this.registerForm.value.password,
-    firstName: this.registerForm.value.firstName,
-    lastName: this.registerForm.value.lastName,
-    address: this.registerForm.value.address,
-    phoneNumber: this.registerForm.value.phoneNumber,
-    roleId: this.registerForm.value.roleId
-  };
+      username: this.registerForm.value.username,
+      email: this.registerForm.value.emailAddress,
+      password: this.registerForm.value.password,
+      firstName: this.registerForm.value.firstName,
+      lastName: this.registerForm.value.lastName,
+      address: this.registerForm.value.address,
+      phoneNumber: this.registerForm.value.phoneNumber,
+      roleId: this.registerForm.value.roleId
+    };
 
     this.authService.register(userData).subscribe(
       (response) => {
-        alert('Utilizator înregistrat cu succes!');
-        this.registerForm.reset();
+        this.showPopup('Succes', 'Utilizator înregistrat cu succes!', true),
+          this.registerForm.reset();
         this.selectedFile = null;
         this.router.navigate(['/login']);
       },
       (error) => {
         console.error('Eroare la înregistrare:', error);
-        alert('Înregistrarea a eșuat. Te rugăm să încerci din nou.');
+        this.showPopup('Eroare', 'Înregistrarea a eșuat. Te rugăm să încerci din nou', true);
+        return;
       }
     );
+  }
+
+  showPopup(title: string, message: string, isError: boolean): void {
+    this.popupTitle = title;
+    this.popupMessage = message;
+    this.popupIsError = isError;
+    this.popupVisible = true;
+  }
+
+    closePopup(): void {
+    this.popupVisible = false;
   }
 }

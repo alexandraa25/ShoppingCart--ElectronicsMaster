@@ -9,6 +9,7 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(c => c.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register/register.component').then(c => c.RegisterComponent) },
   { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(c => c.DashboardComponent) },
+  { path: 'product-form', loadComponent: () => import('./pages/product-form/product-form.component').then(c => c.ProductFormComponent) },
   { path: 'email-confirmation-register', loadComponent: () => import('./pages/email-confirmation-register/email-confirmation-register.component').then(c => c.EmailConfirmarionRegisterComponent) }
 ];
 
