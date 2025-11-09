@@ -33,25 +33,29 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      const email = this.loginForm.get('email')?.value;
-      const password = this.loginForm.get('password')?.value;
-
-      this.authService.login(email, password).subscribe({
-        next: (response) => {
-
-          this.authService.saveToken(response.token);
-
-          this.showPopup('', 'Autentificare reușită!', false);
-          this.router.navigate(['/product-list']);
-        },
-        error: (error) => {
-          this.showPopup('', 'Email sau parolă incorecte!', false);
-        },
-      });
-    } else {
-      this.showPopup('', 'Vă rugăm să completați toate câmpurile.', false);
+    if (this.loginForm.invalid) {
+      this.showPopup('', 'Vă rugăm să completați toate câmpurile.', true);
+      return;
     }
+
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login(email, password).subscribe({
+      next: (response: any) => {
+
+        this.showPopup('', 'Autentificare reușită!', false);
+        // ✅ dacă e admin → dashboard, altfel → produse
+        const role = this.authService.userRole;
+        if (role === 'ADMIN') {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.router.navigate(['/product-list']);
+        }
+      },
+      error: () => {
+        this.showPopup('', 'Email sau parolă incorecte!', true);
+      }
+    });
   }
 
   showPopup(title: string, message: string, isError: boolean): void {

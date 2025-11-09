@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { LoginResponseModel } from '../models/login-response.model';
 
 @Injectable({
@@ -13,8 +13,12 @@ export class AuthService {
 
 
   constructor(private http: HttpClient) {
-    console.log('AuthService initialized!');
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      this.currentUserSubject.next(JSON.parse(savedUser));
+    }
   }
+
 
   register(formData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, formData); // Cerere POST către backend
@@ -36,14 +40,34 @@ export class AuthService {
     return this.http.get<any>(url, { params });
   }
 
-  login(email: string, password: string) {
-    return this.http.post<LoginResponseModel>(`${this.apiUrl}/login`, { email, password });
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true })
+      .pipe(
+        tap((res) => {
+          localStorage.setItem("accessToken", res.accessToken);
+          this.setUser(res.user);
+        })
+      );
   }
 
-  logout(): void {
-    this.currentUserSubject.next(null);
-    localStorage.removeItem('token'); // ✅ corect
-  }
+refresh() {
+  return this.http.post<{ accessToken: string }>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
+    .pipe(
+      tap(res => {
+        localStorage.setItem("accessToken", res.accessToken);
+        this.loadUserFromToken();
+      })
+    );
+}
+
+ logout(): void {
+  this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+    .subscribe(() => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      this.currentUserSubject.next(null);
+    });
+}
 
   saveToken(token: string) {
     localStorage.setItem("token", token);
@@ -53,19 +77,25 @@ export class AuthService {
     return localStorage.getItem("token");
   }
 
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem("token");
-  }
-  
-  get userRole(): string | null {
-  const token = localStorage.getItem('token');
-  if (!token) return null;
-
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  return payload.role ?? null;
-  
- 
+isAuthenticated(): boolean {
+  return !!localStorage.getItem("accessToken");
 }
+
+get userRole(): string | null {
+  const token = localStorage.getItem('accessToken');
+  if (!token || token.split('.').length !== 3) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.role || null;
+  } catch {
+    return null;
+  }
+}
+  setUser(user: any) {
+    this.currentUserSubject.next(user);
+    localStorage.setItem("user", JSON.stringify(user)); // ✅ păstrăm și după refresh
+  }
 
   getAllUsers(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/users`);
@@ -80,7 +110,15 @@ export class AuthService {
     return this.http.delete(`${this.apiUrl}/users/${id}`);
   }
   activateUser(id: number) {
-  return this.http.put(`${this.apiUrl}/${id}/activate`, {});
-}
+    return this.http.put(`${this.apiUrl}/${id}/activate`, {});
+  }
+
+  loadUserFromToken() {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    const payload: any = JSON.parse(atob(token.split('.')[1]));
+    this.currentUserSubject.next({ id: payload.id, role: payload.role, email: payload.email });
+  }
 
 }

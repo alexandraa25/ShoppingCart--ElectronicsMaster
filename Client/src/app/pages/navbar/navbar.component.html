@@ -1,36 +1,43 @@
 <nav class="navbar">
   <div class="navbar-container">
+
+    <!-- LOGO -->
     <a routerLink="/" class="logo">
       <img src="/logo12.png" class="logo-img" />
     </a>
+
     <ul class="nav-links">
-      <a routerLink="/">Home</a>
 
-      <a routerLink="/product-list">Produse</a>
+      <li><a routerLink="/">Home</a></li>
+      <li><a routerLink="/product-list">Produse</a></li>
 
+      <!-- Dacă nu e logat -->
       <ng-container *ngIf="!user">
-        <a routerLink="/login">Login</a>
-        <a routerLink="/register">Register</a>
-        <a routerLink="/cart" class="cart-link">
-          🛒 Coș <span class="cart-count" *ngIf="cartCount > 0">({{ cartCount }})</span>
-        </a>
-
+        <li><a routerLink="/login">Login</a></li>
+        <li><a routerLink="/register">Register</a></li>
       </ng-container>
 
+      <!-- Dacă este logat -->
       <ng-container *ngIf="user">
-        <a (click)="goToProfile()">Profile</a>
-        <a (click)="logout()">Logout</a>
-        <div class="nav-right">
-    <a routerLink="/cart" class="cart-link">
-      🛒 Coș
-      <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
-    </a>
-
-    <a *ngIf="!user" routerLink="/login">Login</a>
-    <span *ngIf="user">Salut, {{ user?.name || user?.email }}</span>
-  </div>
-
+        <li><a (click)="goToProfile()">Profil</a></li>
+        <li><a (click)="logout()">Logout</a></li>
       </ng-container>
+
     </ul>
+
+    <!-- PARTEA DIN DREAPTA -->
+    <div class="nav-right">
+
+      <a routerLink="/cart" class="cart-link">
+        🛒 Coș
+        <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+      </a>
+
+      <span *ngIf="user" class="user-greeting">
+        Salut, {{ user?.name || user?.email }}
+      </span>
+
+    </div>
+
   </div>
 </nav>

@@ -4,7 +4,8 @@ import { AppRoutingModule } from './app.routes';
 import { NgModule } from '@angular/core';
 import { routes } from './app.routes';
 import { RouterModule } from '@angular/router';
-import { AuthService } from './pages/services/auth.service';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './components/auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,13 @@ import { AuthService } from './pages/services/auth.service';
     ReactiveFormsModule,
     AppRoutingModule,
     RouterModule.forRoot(routes)
-  ]
+  ],
+  providers: [
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
+  }
+]
 })
 export class AppModule {}

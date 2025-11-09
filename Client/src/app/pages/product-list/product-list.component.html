@@ -38,11 +38,11 @@
                 </div>
                 <div class="product-actions">
                     <button class="action-button view-button" (click)="viewproduct(product.id)">Vezi produs</button>
-                    <!-- <button class="action-button edit-button" style="margin-left: 20px;" *ngIf="isAdmin" (click)="editProduct(product.id)">Editeaza</button> -->
-                    <button class="action-button edit-button"  (click)="editProduct(product.id)"> Edit
-                    </button>
-                    <!-- <button class="action-button delete-button" *ngIf="isAdmin" (click)="confirmDeleteProduct(product.id)"> Șterge</button> -->
-                    <button class="action-button delete-button" (click)="confirmDeleteProduct(product.id)"> Șterge</button>
+                    <button class="action-button edit-button" style="margin-left: 20px;" *ngIf="isAdmin" (click)="editProduct(product.id)">Editeaza</button>
+                    <!-- <button class="action-button edit-button"  (click)="editProduct(product.id)"> Edit -->
+            
+                    <button class="action-button delete-button" *ngIf="isAdmin" (click)="confirmDeleteProduct(product.id)"> Șterge</button>
+                    <!-- <button class="action-button delete-button" (click)="confirmDeleteProduct(product.id)"> Șterge</button> -->
 
                 </div>
 

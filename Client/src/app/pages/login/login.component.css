@@ -139,3 +139,81 @@ button:hover {
   font-family: 'Arial', sans-serif;
 }
 
+  .wrapper {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 50px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: #fff;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .input-field {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-field input {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-field input:focus {
+      background: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #41efff, #ff2b5c);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .login-button:hover {
+      background: linear-gradient(135deg, #414eff, #2bff53);
+      /* box-shadow: 0 0 20px rgba(255, 75, 43, 0.5); */
+      transform: scale(1.05);
+    }
+
+    .login-button:disabled {
+      background: rgba(255, 255, 255, 0.3);
+      cursor: not-allowed;
+    }

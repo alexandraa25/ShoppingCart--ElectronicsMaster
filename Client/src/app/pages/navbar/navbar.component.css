@@ -42,3 +42,29 @@
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.cart-link {
+  position: relative;
+  color: white;
+  text-decoration: none;
+}
+
+.cart-badge {
+  background: red;
+  border-radius: 50%;
+  padding: 3px 7px;
+  font-size: 12px;
+  position: absolute;
+  top: -8px;
+  right: -10px;
+}
+
+.user-greeting {
+  font-weight: 600;
+}

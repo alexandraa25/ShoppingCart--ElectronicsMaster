@@ -8,10 +8,16 @@ import multer from "multer";
 import path from "path";
 import crypto from "crypto";
 import session from "express-session";
+import cookieParser from "cookie-parser";
+
 
 const app = express();
 const prisma = new PrismaClient();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:4200",
+  credentials: true
+}));
+app.use(cookieParser());
 app.use(express.json());
 
 app.use("/uploads", express.static("uploads"));
@@ -58,10 +64,10 @@ app.post("/register", async (req, res) => {
   res.json({ success: true, user });
 });
 
-// ======================== LOGIN ========================
+// ======================== LOGIN cu Access + Refresh ========================
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
+console.log('Login attempt:', email); 
   const user = await prisma.user.findUnique({
     where: { email },
     include: { role: true }
@@ -72,13 +78,68 @@ app.post("/login", async (req, res) => {
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(400).json({ error: "Parola greșită!" });
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role.name },
+  // Token scurt (folosit la request-uri)
+  const accessToken = jwt.sign(
+    { id: user.id, role: user.role.name },
     JWT_SECRET,
-    { expiresIn: "2h" }
+    { expiresIn: "15m" } // 15 minute
   );
 
-  res.json({ token });
+  // Token lung (folosit după refresh)
+  const refreshToken = jwt.sign(
+    { id: user.id },
+    JWT_SECRET,
+    { expiresIn: "7d" } // 7 zile
+  );
+
+  // Trimitem refreshToken în cookie securizat
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false, // În PROD: true
+    sameSite: "strict",
+    path: "/"
+  });
+
+  // Trimitem access token + info user în JSON
+  res.json({
+    accessToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role.name
+    }
+  });
+});
+
+app.post("/refresh", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.status(401).json({ error: "Nu ești autentificat." });
+
+  jwt.verify(refreshToken, JWT_SECRET, async (err, decoded) => {
+    if (err) return res.status(403).json({ error: "Token invalid." });
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      include: { role: true }
+    });
+
+    const newAccessToken = jwt.sign(
+      { id: user.id, role: user.role.name },
+      JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    res.json({ accessToken: newAccessToken });
+  });
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: false
+  });
+  res.json({ success: true });
 });
 
 // ======================== ROLE ========================
@@ -363,7 +424,30 @@ app.delete("/products/:id", async (req, res) => {
   }
 });
 
+app.get("/check-user-existence", async (req, res) => {
+  const { email, phoneNumber } = req.query;
 
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: email },
+          { phoneNumber: phoneNumber }
+        ]
+      }
+    });
+
+    if (user) {
+      return res.json({ exists: true });
+    }
+
+    return res.json({ exists: false });
+
+  } catch (error) {
+    console.error("EROARE EXISTENȚĂ USER:", error);
+    res.status(500).json({ error: "Eroare la verificarea utilizatorului." });
+  }
+});
 
 // ======================== COS ========================
 app.use(cors({
