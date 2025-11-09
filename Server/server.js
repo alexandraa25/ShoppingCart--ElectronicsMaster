@@ -67,7 +67,7 @@ app.post("/register", async (req, res) => {
 // ======================== LOGIN cu Access + Refresh ========================
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-console.log('Login attempt:', email); 
+  console.log('Login attempt:', email);
   const user = await prisma.user.findUnique({
     where: { email },
     include: { role: true }
@@ -156,7 +156,7 @@ app.get("/users", async (req, res) => {
         id: true,
         name: true,
         email: true,
-        phoneNumber: true,       
+        phoneNumber: true,
         role: {
           select: { name: true } // rolul (ex: admin, user)
         }
@@ -247,7 +247,7 @@ app.get("/products", async (req, res) => {
       price: p.price,
       categoryId: p.categoryId,
       createdAt: p.createdAt,
-      imageUrl: p.images.length > 0 
+      imageUrl: p.images.length > 0
         ? `http://localhost:3000${p.images[0].url}`
         : null
     }));
@@ -467,7 +467,7 @@ app.use(session({
 }));
 function getCart(req) {
   if (!req.session.cart) {
-    req.session.cart = { items: [], totalQty: 0, total: 0 }; 
+    req.session.cart = { items: [], totalQty: 0, total: 0 };
   }
   return req.session.cart;
 }
@@ -570,7 +570,118 @@ app.delete("/cart", (req, res) => {
   res.json(req.session.cart);
 });
 
+app.get("/get-user-details", async (req, res) => {
+  try {
+    // 1) Luăm tokenul din header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: "Missing Authorization header" });
+
+    const token = authHeader.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Token missing" });
+
+    // 2) Decodăm tokenul
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // 3) Luăm userul complet
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        address: true,
+        role: { select: { name: true } }
+      }
+    });
+
+    return res.json(user);
+
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+app.put("/update-user", async (req, res) => {
+  const { id, firstName, lastName, name, email, phoneNumber, address } = req.body;
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { firstName, lastName, name, email, phoneNumber, address }
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Eroare la actualizare profil." });
+  }
+});
+
+app.post("/create-order", authMiddleware, async (req, res) => {
+  try {
+    const { items, total, billingName, billingAddress, deliveryAddress, contactName, contactPhone } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ error: "Coșul este gol." });
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        userId: req.userId,
+        total,
+        status: "PENDING",
+
+        billingName,
+        billingAddress,
+        deliveryAddress,
+        contactName,
+        contactPhone,
+
+        items: {
+          create: items.map(i => ({
+            productId: i.productId,
+            quantity: i.quantity,
+            price: i.price
+          }))
+        }
+      },
+      include: { items: true }
+    });
+
+    res.json({ success: true, order });
+
+  } catch (error) {
+    console.error("❌ Eroare la create-order:", error);
+    return res.status(500).json({ error: "Eroare la creare comandă." });
+  }
+});
+
+
 // ======================== START SERVER ========================
 app.listen(3000, () =>
   console.log("✅ Server ON: http://localhost:3000")
 );
+
+function authMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ error: "Missing token" });
+
+  const token = header.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Missing token" });
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ error: "TOKEN_EXPIRED" });
+      }
+      return res.status(403).json({ error: "Invalid token" });
+    }
+
+    req.userId = decoded.id;
+    next();
+  });
+}

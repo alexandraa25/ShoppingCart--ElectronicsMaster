@@ -8,24 +8,25 @@ datasource db {
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  name        String @unique
-  email       String  @unique
-  password    String
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  email    String @unique
+  password String
 
   firstName   String
   lastName    String
   address     String?
   phoneNumber String?
 
-  roleId      Int
-  role        Role    @relation(fields: [roleId], references: [id])
+  roleId Int
+  role   Role    @relation(fields: [roleId], references: [id])
+  orders Order[]
 }
 
 model Role {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique
-  
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
   users User[]
 }
 
@@ -36,39 +37,77 @@ model Category {
 }
 
 model Product {
-  id          Int             @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   name        String
   description String
   price       Float
   stock       Int
   categoryId  Int
-  category    Category        @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]  
-  createdAt   DateTime        @default(now())   
-  updatedAt   DateTime        @default(now()) @updatedAt     
+  category    Category       @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now()) @updatedAt
+  orderItems  OrderItem[]
 }
 
 model ProductImage {
   id        Int     @id @default(autoincrement())
-  url       String  // calea / URL-ul imaginii
+  url       String // calea / URL-ul imaginii
   productId Int
   product   Product @relation(fields: [productId], references: [id])
 }
 
 model DeletedProduct {
-  id          Int             @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement())
   name        String
   description String
   price       Float
   stock       Int
   categoryId  Int
-  deletedAt   DateTime        @default(now())
+  deletedAt   DateTime              @default(now())
   images      DeletedProductImage[]
 }
 
 model DeletedProductImage {
-  id              Int    @id @default(autoincrement())
-  url             String
+  id               Int            @id @default(autoincrement())
+  url              String
   deletedProductId Int
-  deletedProduct  DeletedProduct @relation(fields: [deletedProductId], references: [id])
+  deletedProduct   DeletedProduct @relation(fields: [deletedProductId], references: [id])
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          Int
+  user            User        @relation(fields: [userId], references: [id])
+
+  total           Float
+  status          String       @default("PENDING")
+
+  billingName     String?
+  billingAddress  String?
+  deliveryAddress String?
+  contactName     String?
+  contactPhone    String?
+
+  items           OrderItem[]
+  createdAt       DateTime     @default(now())
+}
+model OrderItem {
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Float // prețul produsului la momentul comenzii
+}
+
+enum OrderStatus {
+  PENDING // comanda a fost creată
+  PROCESSING // pregătire / preluare
+  SHIPPED // expediată
+  COMPLETED // livrată
+  CANCELLED // anulată
 }

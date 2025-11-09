@@ -14,6 +14,8 @@ export const routes: Routes = [
   { path: 'product-detail', loadComponent: () => import('./pages/product-detail/product-detail.component').then(c => c.ProductDetailComponent)},
   { path: 'cart', loadComponent: () => import('./pages/cart/cart.component').then(m => m.CartComponent), canActivate: [AuthGuard] },
   { path: 'admin-dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.AdminDashboardComponent), canActivate: [AuthGuard] },
+  { path: 'profil-user', loadComponent: () => import('./pages/profil-user/profil-user.component').then(m => m.ProfilUserComponent), canActivate: [AuthGuard] },
+  { path: 'checkout', loadComponent: () => import('./pages/order-checkout/order-checkout.component').then(c => c.OrderCheckoutComponent), canActivate: [AuthGuard] }
 ];
 
 @NgModule({

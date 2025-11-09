@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DecimalPipe, CommonModule } from '@angular/common';
 import { CartService } from '../services/cart-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -14,7 +15,7 @@ export class CartComponent implements OnInit {
   cart: any[] = [];
   total: number = 0;
 
-  constructor(private cartService: CartService) {}
+  constructor(private cartService: CartService,private router: Router) {}
 
   ngOnInit(): void {
     this.cart = this.cartService.getCart();
@@ -38,4 +39,11 @@ export class CartComponent implements OnInit {
     this.cart = [];
     this.total = 0;
   }
+
+  checkout() {
+
+    console.log('Checkout initiated. Cart contents:', this.cart);
+  if (this.cart.length === 0) return;
+  this.router.navigate(['/checkout']);
+}
 }

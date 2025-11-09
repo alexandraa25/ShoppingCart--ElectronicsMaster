@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { LoginResponseModel } from '../models/login-response.model';
+import { UserDetailsModel } from '../models/user-details.model';
 
 @Injectable({
   providedIn: 'root', // Configurare pentru injectare globală
@@ -50,24 +51,24 @@ export class AuthService {
       );
   }
 
-refresh() {
-  return this.http.post<{ accessToken: string }>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
-    .pipe(
-      tap(res => {
-        localStorage.setItem("accessToken", res.accessToken);
-        this.loadUserFromToken();
-      })
-    );
-}
+  refresh() {
+    return this.http.post<{ accessToken: string }>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
+      .pipe(
+        tap(res => {
+          localStorage.setItem("accessToken", res.accessToken);
+          this.loadUserFromToken();
+        })
+      );
+  }
 
- logout(): void {
-  this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
-    .subscribe(() => {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
-      this.currentUserSubject.next(null);
-    });
-}
+  logout(): void {
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+      .subscribe(() => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        this.currentUserSubject.next(null);
+      });
+  }
 
   saveToken(token: string) {
     localStorage.setItem("token", token);
@@ -77,21 +78,21 @@ refresh() {
     return localStorage.getItem("token");
   }
 
-isAuthenticated(): boolean {
-  return !!localStorage.getItem("accessToken");
-}
-
-get userRole(): string | null {
-  const token = localStorage.getItem('accessToken');
-  if (!token || token.split('.').length !== 3) return null;
-
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.role || null;
-  } catch {
-    return null;
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem("accessToken");
   }
-}
+
+  get userRole(): string | null {
+    const token = localStorage.getItem('accessToken');
+    if (!token || token.split('.').length !== 3) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role || null;
+    } catch {
+      return null;
+    }
+  }
   setUser(user: any) {
     this.currentUserSubject.next(user);
     localStorage.setItem("user", JSON.stringify(user)); // ✅ păstrăm și după refresh
@@ -121,4 +122,20 @@ get userRole(): string | null {
     this.currentUserSubject.next({ id: payload.id, role: payload.role, email: payload.email });
   }
 
+getUserDetails() {
+  const token = localStorage.getItem('accessToken');
+  return this.http.get<UserDetailsModel>("http://localhost:3000/get-user-details", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+updateProfile(data: any) {
+  const token = localStorage.getItem("accessToken");
+
+  return this.http.put("http://localhost:3000/update-user", data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
 }

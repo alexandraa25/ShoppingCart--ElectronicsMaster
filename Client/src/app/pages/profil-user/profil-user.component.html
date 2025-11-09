@@ -1,0 +1,94 @@
+<div class="profile-page">
+
+    <div class="profile-card">
+        <h2>Profil utilizator</h2>
+
+        <!-- FORMULAR LEGAT -->
+        <form class="info-grid" [formGroup]="profileForm">
+
+            <!-- Nume -->
+            <div class="info-box">
+                <label>Nume</label>
+                <ng-container *ngIf="!editMode; else editFirstName">
+                    <div class="value">{{ user?.firstName || '-' }}</div>
+                </ng-container>
+                <ng-template #editFirstName>
+                    <input class="input-edit" formControlName="firstName" />
+                </ng-template>
+            </div>
+
+            <!-- Prenume -->
+            <div class="info-box">
+                <label>Prenume</label>
+                <ng-container *ngIf="!editMode; else editLastName">
+                    <div class="value">{{ user?.lastName || '-' }}</div>
+                </ng-container>
+                <ng-template #editLastName>
+                    <input class="input-edit" formControlName="lastName" />
+                </ng-template>
+            </div>
+
+            <!-- Username -->
+            <div class="info-box">
+                <label>Username</label>
+                <ng-container *ngIf="!editMode; else editUsername">
+                    <div class="value">{{ user?.name || '-' }}</div>
+                </ng-container>
+                <ng-template #editUsername>
+                    <input class="input-edit" formControlName="name" />
+                </ng-template>
+            </div>
+
+            <!-- Email -->
+            <div class="info-box">
+                <label>Email</label>
+                <ng-container *ngIf="!editMode; else editEmail">
+                    <div class="value">{{ user?.email || '-' }}</div>
+                </ng-container>
+                <ng-template #editEmail>
+                    <input class="input-edit" formControlName="email" />
+                </ng-template>
+            </div>
+
+            <!-- Telefon -->
+            <div class="info-box">
+                <label>Telefon</label>
+                <ng-container *ngIf="!editMode; else editPhone">
+                    <div class="value">{{ user?.phoneNumber || '-' }}</div>
+                </ng-container>
+                <ng-template #editPhone>
+                    <input class="input-edit" formControlName="phoneNumber" />
+                </ng-template>
+            </div>
+
+            <!-- Adresă -->
+            <div class="info-box">
+                <label>Adresă</label>
+                <ng-container *ngIf="!editMode; else editAddress">
+                    <div class="value">{{ user?.address || '-' }}</div>
+                </ng-container>
+                <ng-template #editAddress>
+                    <input class="input-edit" formControlName="address" />
+                </ng-template>
+            </div>
+
+        </form> <!-- ✅ FORMUL AR ÎNCHIS -->
+
+        <!-- Butoane -->
+        <div class="button-row">
+            <button *ngIf="!editMode" class="edit-btn" (click)="enableEdit()">✏️ Editează Profil</button>
+
+            <div *ngIf="editMode" class="button-edit-group">
+                <button class="save-btn" (click)="saveProfile()">💾 Salvează</button>
+                <button class="cancel-btn" (click)="cancelEdit()">✖️ Anulează</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="orders-card">
+        <h3>📦 Comenzile tale</h3>
+        <div class="placeholder">Momentan nu ai comenzi plasate.</div>
+    </div>
+
+</div>

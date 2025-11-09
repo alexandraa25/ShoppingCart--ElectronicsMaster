@@ -1,0 +1,48 @@
+<div class="checkout-page">
+  <h1 class="title">🧾 Finalizare comandă</h1>
+
+  <div class="checkout-container">
+
+    <!-- FORM -->
+    <form class="checkout-form" [formGroup]="checkoutForm">
+
+      <h2>🏢 Detalii de facturare</h2>
+      <label>Nume / Firmă</label>
+      <input formControlName="billingName">
+
+      <label>Adresă facturare</label>
+      <textarea formControlName="billingAddress"></textarea>
+
+      <h2>🚚 Livrare</h2>
+      <label>Adresă livrare</label>
+      <textarea formControlName="deliveryAddress"></textarea>
+
+      <h2>👤 Persoană de contact</h2>
+      <label>Nume persoană de contact</label>
+      <input formControlName="contactName">
+
+      <label>Telefon</label>
+      <input formControlName="contactPhone">
+
+      <button class="place-btn" (click)="placeOrder()">✅ Plasează comanda</button>
+    </form>
+
+    <!-- PRODUCT SUMMARY -->
+    <div class="summary">
+      <h2>Produsele tale</h2>
+
+      <div class="item" *ngFor="let item of cart">
+        <span>{{ item.name }} x{{ item.quantity }}</span>
+        <strong>{{ item.price * item.quantity | number:'1.2-2' }} lei</strong>
+      </div>
+
+      <hr>
+
+      <div class="total-row">
+        <span>Total:</span>
+        <strong>{{ total | number:'1.2-2' }} lei</strong>
+      </div>
+    </div>
+
+  </div>
+</div>

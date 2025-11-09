@@ -54,8 +54,9 @@ export class NavbarComponent implements OnInit {
 
 
       const decoded: any = jwtDecode(token);
-      // rolul e stocat sub cheia completă
-      const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      console.log('Decoded token:', decoded);
+      const role = decoded["role"];
 
       console.log('Navigating based on role:', role);
 
