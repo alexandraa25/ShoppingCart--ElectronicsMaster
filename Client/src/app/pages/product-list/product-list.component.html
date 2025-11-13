@@ -9,7 +9,6 @@
 </app-popup-message>
 <div class="product-list-container">
 
-    <!-- FILTERS -->
     <div class="filters-container">
         <input class="search-bar" type="text" [formControl]="searchControl" placeholder="🔍 Cauta un produs....." />
 
@@ -26,7 +25,6 @@
         </select>
     </div>
 
-    <!-- product LIST -->
     <div class="product-grid">
         <div class="product-card" *ngFor="let product of paginatedproducts">
             <div class="product-info">
@@ -39,11 +37,7 @@
                 <div class="product-actions">
                     <button class="action-button view-button" (click)="viewproduct(product.id)">Vezi produs</button>
                     <button class="action-button edit-button" style="margin-left: 20px;" *ngIf="isAdmin" (click)="editProduct(product.id)">Editeaza</button>
-                    <!-- <button class="action-button edit-button"  (click)="editProduct(product.id)"> Edit -->
-            
                     <button class="action-button delete-button" *ngIf="isAdmin" (click)="confirmDeleteProduct(product.id)"> Șterge</button>
-                    <!-- <button class="action-button delete-button" (click)="confirmDeleteProduct(product.id)"> Șterge</button> -->
-
                 </div>
 
             </div>
@@ -53,7 +47,6 @@
         </div>
     </div>
 
-    <!-- PAGINATION -->
     <div class="pagination">
         <button [disabled]="currentPage === 1" (click)="previousPage()">‹ Previous</button>
         <span>Pagina {{ currentPage }} din {{ totalPages }}</span>

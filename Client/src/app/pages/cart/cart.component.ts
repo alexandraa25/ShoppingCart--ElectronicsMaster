@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, DecimalPipe],  // ✅ ADĂUGAT
+  imports: [CommonModule, DecimalPipe], 
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })

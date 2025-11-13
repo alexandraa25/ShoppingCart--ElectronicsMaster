@@ -8,10 +8,9 @@
   align-items: center;
 }
 
-/* Cardul profilului devine FULL WIDTH */
 .profile-card {
   width: 100%;
-  max-width: 1400px; /* poți mări sau micșora după gust */
+  max-width: 1400px; 
   background: #1e293b;
   border-radius: 14px;
   padding: 45px 60px;
@@ -27,7 +26,6 @@
   font-size: 2rem;
 }
 
-/* GRID mare, frumos, aerisit */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -52,7 +50,6 @@
   color: #f8fafc;
 }
 
-/* Buton edit */
 .edit-btn {
   display: block;
   margin: 35px auto 0;
@@ -68,7 +65,6 @@
 }
 .edit-btn:hover { background: #eab308; }
 
-/* Card comenzi */
 .orders-card {
   width: 100%;
   max-width: 1400px;
@@ -111,7 +107,6 @@
   justify-content: flex-start;
 }
 
-/* Salvează */
 .save-btn {
   background: #facc15;
   color: #1e293b;
@@ -132,7 +127,6 @@
   box-shadow: 0 0 12px rgba(255, 204, 0, 0.35);
 }
 
-/* Anulează */
 .cancel-btn {
   background: transparent;
   color: #e2e8f0;
@@ -189,7 +183,6 @@
   font-weight: bold;
 }
 
-/* Responsivitate pentru telefon */
 @media (max-width: 900px) {
   .info-grid {
     grid-template-columns: 1fr;

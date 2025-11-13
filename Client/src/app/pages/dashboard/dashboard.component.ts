@@ -31,7 +31,7 @@ export class AdminDashboardComponent implements OnInit {
   popupIsError = false;
   popupConfirmMode = false;
 
-  // doar delete
+ 
   userTargetId: number | null = null;
 
   constructor(private authService: AuthService, private orderService: OrderService) {}
@@ -78,7 +78,6 @@ export class AdminDashboardComponent implements OnInit {
     this.paginateUsers();
   }
 
-  // ✅ Confirm delete popup
   confirmDeleteUser(id: number): void {
     this.popupTitle = "Ștergere Utilizator";
     this.popupMessage = "Ești sigur că vrei să ștergi definitiv acest utilizator?";
@@ -87,7 +86,6 @@ export class AdminDashboardComponent implements OnInit {
     this.popupVisible = true;
   }
 
-  // ✅ Execute delete
   handleConfirm(): void {
     if (!this.userTargetId) return;
 

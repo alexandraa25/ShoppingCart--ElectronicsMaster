@@ -43,7 +43,7 @@ export class ProfilUserComponent {
       next: (data: any) => {
         this.user = data;
         this.profileForm.patchValue({
-          id: data.id || data.Id,                   // <-- aici reparăm
+          id: data.id || data.Id,                  
           firstName: data.firstName || data.FirstName,
           lastName: data.lastName || data.LastName,
           name: data.name || data.Name,

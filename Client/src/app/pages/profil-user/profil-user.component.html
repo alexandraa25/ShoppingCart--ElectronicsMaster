@@ -3,10 +3,8 @@
     <div class="profile-card">
         <h2>Profil utilizator</h2>
 
-        <!-- FORMULAR LEGAT -->
         <form class="info-grid" [formGroup]="profileForm">
 
-            <!-- Nume -->
             <div class="info-box">
                 <label>Nume</label>
                 <ng-container *ngIf="!editMode; else editFirstName">
@@ -17,7 +15,6 @@
                 </ng-template>
             </div>
 
-            <!-- Prenume -->
             <div class="info-box">
                 <label>Prenume</label>
                 <ng-container *ngIf="!editMode; else editLastName">
@@ -28,7 +25,6 @@
                 </ng-template>
             </div>
 
-            <!-- Username -->
             <div class="info-box">
                 <label>Username</label>
                 <ng-container *ngIf="!editMode; else editUsername">
@@ -39,7 +35,6 @@
                 </ng-template>
             </div>
 
-            <!-- Email -->
             <div class="info-box">
                 <label>Email</label>
                 <ng-container *ngIf="!editMode; else editEmail">
@@ -50,7 +45,6 @@
                 </ng-template>
             </div>
 
-            <!-- Telefon -->
             <div class="info-box">
                 <label>Telefon</label>
                 <ng-container *ngIf="!editMode; else editPhone">
@@ -61,7 +55,6 @@
                 </ng-template>
             </div>
 
-            <!-- Adresă -->
             <div class="info-box">
                 <label>Adresă</label>
                 <ng-container *ngIf="!editMode; else editAddress">
@@ -72,9 +65,8 @@
                 </ng-template>
             </div>
 
-        </form> <!-- ✅ FORMUL AR ÎNCHIS -->
+        </form>
 
-        <!-- Butoane -->
         <div class="button-row">
             <button *ngIf="!editMode" class="edit-btn" (click)="enableEdit()">✏️ Editează Profil</button>
 
@@ -88,29 +80,29 @@
 
     <div class="orders-card">
         <h3>📦 Comenzile tale</h3>
-       <div *ngIf="orders.length === 0" class="placeholder">
-  Momentan nu ai comenzi plasate.
-</div>
+        <div *ngIf="orders.length === 0" class="placeholder">
+            Momentan nu ai comenzi plasate.
+        </div>
 
-<div *ngFor="let order of orders" class="order-box">
-  <div class="order-header">
-    <span>🧾 Comandă #{{order.id}}</span>
-    <span class="order-status">{{ order.status }}</span>
-    <span class="order-date">{{ order.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
-  </div>
+        <div *ngFor="let order of orders" class="order-box">
+            <div class="order-header">
+                <span>🧾 Comandă #{{order.id}}</span>
+                <span class="order-status">{{ order.status }}</span>
+                <span class="order-date">{{ order.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+            </div>
 
-  <div class="order-items">
-    <div class="order-item" *ngFor="let item of order.items">
-      <span>{{ item.product.name }}</span>
-      <span>x{{ item.quantity }}</span>
-      <span>{{ item.price * item.quantity | number:'1.2-2'}} lei</span>
-    </div>
-  </div>
+            <div class="order-items">
+                <div class="order-item" *ngFor="let item of order.items">
+                    <span>{{ item.product.name }}</span>
+                    <span>x{{ item.quantity }}</span>
+                    <span>{{ item.price * item.quantity | number:'1.2-2'}} lei</span>
+                </div>
+            </div>
 
-  <div class="order-total">
-    Total: <strong>{{ order.total | number:'1.2-2' }} lei</strong>
-  </div>
-</div>
+            <div class="order-total">
+                Total: <strong>{{ order.total | number:'1.2-2' }} lei</strong>
+            </div>
+        </div>
     </div>
 
 </div>

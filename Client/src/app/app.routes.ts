@@ -19,7 +19,6 @@ export const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })], // Adaugă `{ useHash: true }` dacă serverul nu suportă URL rewriting.
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes, { useHash: true })], 
 })
 export class AppRoutingModule {}

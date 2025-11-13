@@ -4,6 +4,6 @@ import { AppComponent } from './app.component';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient() // Aici furnizăm HttpClient pentru întreaga aplicație
+    provideHttpClient() 
   ]
 }).catch(err => console.error(err));

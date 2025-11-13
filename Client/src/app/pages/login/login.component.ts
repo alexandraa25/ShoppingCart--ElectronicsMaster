@@ -44,7 +44,6 @@ export class LoginComponent implements OnInit {
       next: (response: any) => {
 
         this.showPopup('', 'Autentificare reușită!', false);
-        // ✅ dacă e admin → dashboard, altfel → produse
         const role = this.authService.userRole;
         if (role === 'ADMIN') {
           this.router.navigate(['/dashboard']);

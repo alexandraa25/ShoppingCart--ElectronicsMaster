@@ -84,7 +84,6 @@
   max-width: 90%;
 }
 
-/* Wrapper pentru zona de cantitate + buton */
 .quantity-add {
   display: flex;
   align-items: center;
@@ -92,7 +91,6 @@
   margin-top: 1.8rem;
 }
 
-/* Controale pentru cantitate */
 .qty-controls {
   display: flex;
   align-items: center;
@@ -123,7 +121,6 @@
   transform: scale(0.9);
 }
 
-/* Buton Adauga in cos */
 .add-btn {
   background: #facc15;
   color: #111827;

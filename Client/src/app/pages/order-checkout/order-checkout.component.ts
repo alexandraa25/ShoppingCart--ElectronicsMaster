@@ -57,57 +57,53 @@ export class OrderCheckoutComponent implements OnInit {
   }
 
 
-placeOrder() {
-  const order = {
-    items: this.cart.map(i => ({
-      productId: i.id,
-      quantity: i.quantity,
-      price: i.price
-    })),
-    total: this.total,
-    ...this.checkoutForm.value
-  };
+  placeOrder() {
+    const order = {
+      items: this.cart.map(i => ({
+        productId: i.id,
+        quantity: i.quantity,
+        price: i.price
+      })),
+      total: this.total,
+      ...this.checkoutForm.value
+    };
 
-  this.orderService.createOrder(order).subscribe({
-    next: () => {
-      this.cartService.clearCart();
-      this.router.navigate(['/profil-user']);
-      alert("✅ Comanda ta a fost plasată cu succes!");
-    },
-    error: (err) => {
+    this.orderService.createOrder(order).subscribe({
+      next: () => {
+        this.cartService.clearCart();
+        this.router.navigate(['/profil-user']);
+        alert("✅ Comanda ta a fost plasată cu succes!");
+      },
+      error: (err) => {
 
-      // Dacă token expirat → încercăm refresh
-      if (err.status === 401) {
+        if (err.status === 401) {
 
-        this.auth.refresh().subscribe({
-          next: (res) => {
+          this.auth.refresh().subscribe({
+            next: (res) => {
 
-            // salvăm token-ul nou
-            localStorage.setItem("accessToken", res.accessToken);
+              localStorage.setItem("accessToken", res.accessToken);
 
-            // retrimitem comanda
-            this.orderService.createOrder(order).subscribe({
-              next: () => {
-                this.cartService.clearCart();
-                this.router.navigate(['/profil-user']);
-                alert("✅ Comanda ta a fost plasată după reîmprospătarea token-ului!");
-              },
-              error: () => alert("❌ Eroare chiar și după refresh.")
-            });
-          },
+              this.orderService.createOrder(order).subscribe({
+                next: () => {
+                  this.cartService.clearCart();
+                  this.router.navigate(['/profil-user']);
+                  alert("✅ Comanda ta a fost plasată după reîmprospătarea token-ului!");
+                },
+                error: () => alert("❌ Eroare chiar și după refresh.")
+              });
+            },
 
-          error: () => {
-            alert("⚠️ Sesiunea a expirat. Te rugăm să te autentifici din nou.");
-            this.router.navigate(['/login']);
-          }
-        });
+            error: () => {
+              alert("⚠️ Sesiunea a expirat. Te rugăm să te autentifici din nou.");
+              this.router.navigate(['/login']);
+            }
+          });
 
-      } else {
-        alert("❌ A apărut o eroare la trimiterea comenzii.");
+        } else {
+          alert("❌ A apărut o eroare la trimiterea comenzii.");
+        }
       }
-    }
-  });
-}
-
+    });
+  }
 
 }

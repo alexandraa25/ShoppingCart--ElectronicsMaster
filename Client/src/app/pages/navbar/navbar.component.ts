@@ -10,7 +10,7 @@ import { jwtDecode } from 'jwt-decode';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'] // <- corect
+  styleUrls: ['./navbar.component.css'] 
 })
 export class NavbarComponent implements OnInit {
   user: any;
@@ -19,12 +19,11 @@ export class NavbarComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private cart: CartService            // <- injecție corectă
+    private cart: CartService            
   ) { }
 
   ngOnInit(): void {
     this.authService.user$.subscribe(u => this.user = u);
-    // ia valoarea curentă + actualizări
     this.cart.cartCount$.subscribe(count => (this.cartCount = count));
     this.authService.user$.subscribe(u => this.user = u);
   }
@@ -36,11 +35,11 @@ export class NavbarComponent implements OnInit {
   }
 
   goToAnnouncements() {
-    this.router.navigate(['/announcement-list']); // fără queryParams
+    this.router.navigate(['/announcement-list']); 
   }
 
   goToProfile() {
-    const token = localStorage.getItem('accessToken'); // sau localStorage
+    const token = localStorage.getItem('accessToken'); 
 
 
     console.log('Token retrieved from sessionStorage:', token); 
@@ -51,7 +50,6 @@ export class NavbarComponent implements OnInit {
     }
 
     try {
-
 
       const decoded: any = jwtDecode(token);
 

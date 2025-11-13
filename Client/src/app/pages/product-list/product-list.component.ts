@@ -29,42 +29,42 @@ interface Category {
   styleUrls: ['./product-list.component.scss'],
 })
 export class productListComponent implements OnInit {
-  products: Product[] = [];            
+  products: Product[] = [];
   searchControl = new FormControl('');
   categoryControl = new FormControl('');
   sortByControl = new FormControl('newest');
   filteredproducts: Product[] = [];
   itemsPerPage = 20;
   currentPage = 1;
-  paginatedproducts: Product[] = [];   
+  paginatedproducts: Product[] = [];
   categories: Category[] = [];
 
   userId: string | null = null;
   isAdmin: boolean = false;
   popupVisible = false;
-popupTitle = '';
-popupMessage = '';
-popupIsError = false;
-popupConfirmMode = false;
-productToDelete: number | null = null;
+  popupTitle = '';
+  popupMessage = '';
+  popupIsError = false;
+  popupConfirmMode = false;
+  productToDelete: number | null = null;
 
 
 
-  constructor(private ProductService: ProductService, private categoryService: CategoryService, private router: Router, private route: ActivatedRoute,private authService: AuthService) { }
+  constructor(private ProductService: ProductService, private categoryService: CategoryService, private router: Router, private route: ActivatedRoute, private authService: AuthService) { }
 
   ngOnInit(): void {
-  this.loadproducts();
-  this.loadCategories();
+    this.loadproducts();
+    this.loadCategories();
 
-  this.searchControl.valueChanges.subscribe(() => this.applyFilters());
-  this.categoryControl.valueChanges.subscribe(() => this.applyFilters());
-  this.sortByControl.valueChanges.subscribe(() => this.applyFilters());
+    this.searchControl.valueChanges.subscribe(() => this.applyFilters());
+    this.categoryControl.valueChanges.subscribe(() => this.applyFilters());
+    this.sortByControl.valueChanges.subscribe(() => this.applyFilters());
 
-  this.authService.user$.subscribe(user => {
-    this.userId = user?.sub || null;
-    this.isAdmin = this.authService.userRole === 'Admin'; 
-  });
-}
+    this.authService.user$.subscribe(user => {
+      this.userId = user?.sub || null;
+      this.isAdmin = this.authService.userRole === 'Admin';
+    });
+  }
 
   loadCategories(): void {
     this.categoryService.getCategories().subscribe({
@@ -79,51 +79,51 @@ productToDelete: number | null = null;
     });
   }
 
-loadproducts(): void {
-  this.ProductService.getProducts().subscribe({
-    next: (data: any[]) => {
-      
-      this.products = data.map(p => ({
-        id: p.id,
-        name: p.name,
-        price: p.price,
-        categoryId: p.categoryId,
-        datePosted: p.createdAt ?? null,
-        imageUrl: p.imageUrl || 'https://via.placeholder.com/300x200'
-      }));
+  loadproducts(): void {
+    this.ProductService.getProducts().subscribe({
+      next: (data: any[]) => {
 
-      this.filteredproducts = [...this.products];
-      this.paginate();
-    },
-    error: (err) => console.error("Eroare la obținerea produselor:", err)
-  });
-}
+        this.products = data.map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          categoryId: p.categoryId,
+          datePosted: p.createdAt ?? null,
+          imageUrl: p.imageUrl || 'https://via.placeholder.com/300x200'
+        }));
+
+        this.filteredproducts = [...this.products];
+        this.paginate();
+      },
+      error: (err) => console.error("Eroare la obținerea produselor:", err)
+    });
+  }
 
 
   applyFilters(): void {
-  const searchTerm = this.searchControl.value?.toLowerCase() ?? '';
-  const category = this.categoryControl.value ?? '';
-  const sortBy = this.sortByControl.value ?? 'newest';
+    const searchTerm = this.searchControl.value?.toLowerCase() ?? '';
+    const category = this.categoryControl.value ?? '';
+    const sortBy = this.sortByControl.value ?? 'newest';
 
-  let filtered = this.products.filter(p =>
-    p.name.toLowerCase().includes(searchTerm) &&
-    (!category || p.categoryId === +category)
-  );
+    let filtered = this.products.filter(p =>
+      p.name.toLowerCase().includes(searchTerm) &&
+      (!category || p.categoryId === +category)
+    );
 
-  if (sortBy === 'newest') {
-    filtered.sort((a, b) =>
-      new Date(b.datePosted ?? 0).getTime() - new Date(a.datePosted ?? 0).getTime()
-    );
-  } else {
-    filtered.sort((a, b) =>
-      new Date(a.datePosted ?? 0).getTime() - new Date(b.datePosted ?? 0).getTime()
-    );
+    if (sortBy === 'newest') {
+      filtered.sort((a, b) =>
+        new Date(b.datePosted ?? 0).getTime() - new Date(a.datePosted ?? 0).getTime()
+      );
+    } else {
+      filtered.sort((a, b) =>
+        new Date(a.datePosted ?? 0).getTime() - new Date(b.datePosted ?? 0).getTime()
+      );
+    }
+
+    this.filteredproducts = filtered;
+    this.currentPage = 1;
+    this.paginate();
   }
-
-  this.filteredproducts = filtered;
-  this.currentPage = 1;
-  this.paginate();
-}
 
   get totalPages(): number {
     return Math.ceil(this.filteredproducts.length / this.itemsPerPage);
@@ -149,51 +149,51 @@ loadproducts(): void {
     }
   }
 
-editProduct(id: number) {
-  this.router.navigate(['/product-form'], { queryParams: { id } });
-}
+  editProduct(id: number) {
+    this.router.navigate(['/product-form'], { queryParams: { id } });
+  }
   viewproduct(id: number) {
-  this.router.navigate(['/product-detail'], { queryParams: { id } });
-}
-  
+    this.router.navigate(['/product-detail'], { queryParams: { id } });
+  }
 
-confirmDeleteProduct(id: number): void {
-  this.productToDelete = id;
-  this.popupTitle = "Confirmare ștergere";
-  this.popupMessage = "Ești sigur că vrei să muți produsul în arhivă?";
-  this.popupIsError = false;
-  this.popupConfirmMode = true; 
-  this.popupVisible = true;
-}
 
-deleteProductConfirmed(): void {
-  if (!this.productToDelete) return;
+  confirmDeleteProduct(id: number): void {
+    this.productToDelete = id;
+    this.popupTitle = "Confirmare ștergere";
+    this.popupMessage = "Ești sigur că vrei să muți produsul în arhivă?";
+    this.popupIsError = false;
+    this.popupConfirmMode = true;
+    this.popupVisible = true;
+  }
 
-  this.ProductService.deleteProduct(this.productToDelete).subscribe({
-    next: () => {
-      this.products = this.products.filter(p => p.id !== this.productToDelete);
-      this.applyFilters();
-      this.closePopup(); // IMPORTANT
-      this.showPopup("Succes", "Produs mutat în arhivă cu succes!", false);
-    },
-    error: () => {
-      this.closePopup();
-      this.showPopup("Eroare", "Nu am putut muta produsul în arhivă.", true);
-    }
-  });
-}
+  deleteProductConfirmed(): void {
+    if (!this.productToDelete) return;
 
-showPopup(title: string, message: string, confirmMode = false) {
-  this.popupTitle = title;
-  this.popupMessage = message;
-  this.popupIsError = confirmMode ? false : this.popupIsError;
-  this.popupConfirmMode = confirmMode;
-  this.popupVisible = true;
-}
-closePopup(): void {
-  this.popupVisible = false;
-  this.popupConfirmMode = false; 
-  this.productToDelete = null;   
-}
+    this.ProductService.deleteProduct(this.productToDelete).subscribe({
+      next: () => {
+        this.products = this.products.filter(p => p.id !== this.productToDelete);
+        this.applyFilters();
+        this.closePopup();
+        this.showPopup("Succes", "Produs mutat în arhivă cu succes!", false);
+      },
+      error: () => {
+        this.closePopup();
+        this.showPopup("Eroare", "Nu am putut muta produsul în arhivă.", true);
+      }
+    });
+  }
+
+  showPopup(title: string, message: string, confirmMode = false) {
+    this.popupTitle = title;
+    this.popupMessage = message;
+    this.popupIsError = confirmMode ? false : this.popupIsError;
+    this.popupConfirmMode = confirmMode;
+    this.popupVisible = true;
+  }
+  closePopup(): void {
+    this.popupVisible = false;
+    this.popupConfirmMode = false;
+    this.productToDelete = null;
+  }
 
 }

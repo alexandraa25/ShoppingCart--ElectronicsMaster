@@ -121,21 +121,20 @@ button:hover {
   color: #fff;
 }
 .success-snackbar {
-  background-color: #4caf50; /* Verde pentru succes */
+  background-color: #4caf50; 
   color: white;
 }
 
 .fail-snackbar {
-  background-color: #f44336; /* Roșu pentru eroare */
+  background-color: #f44336; 
   color: white;
 }
 
-/* Stil pentru snackbar alb */
 .white-snackbar {
-  background-color: #fff !important; /* Fundal alb */
-  color: #000 !important; /* Text negru */
-  border-radius: 8px; /* Colțuri rotunjite */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Umbră subtilă */
+  background-color: #fff !important;
+  color: #000 !important; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
   font-family: 'Arial', sans-serif;
 }
 

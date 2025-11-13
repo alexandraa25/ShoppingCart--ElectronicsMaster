@@ -7,9 +7,9 @@ import { BehaviorSubject } from 'rxjs';
 export class CartService {
 
   private storageKey = 'shopping_cart';
-cartCount$ = new BehaviorSubject<number>(0);
+  cartCount$ = new BehaviorSubject<number>(0);
 
-  constructor() { 
+  constructor() {
     this.updateCount();
   }
 
@@ -27,19 +27,19 @@ cartCount$ = new BehaviorSubject<number>(0);
     localStorage.setItem(this.storageKey, JSON.stringify(cart));
   }
 
-addToCart(product: any, quantity: number = 1): void {
-  let cart = this.getCart();
+  addToCart(product: any, quantity: number = 1): void {
+    let cart = this.getCart();
 
-  const existingItem = cart.find(item => item.id === product.id);
+    const existingItem = cart.find(item => item.id === product.id);
 
-  if (existingItem) {
-    existingItem.quantity += quantity;
-  } else {
-    cart.push({ ...product, quantity });
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.push({ ...product, quantity });
+    }
+
+    this.saveCart(cart);
   }
-
-  this.saveCart(cart);
-}
 
   removeFromCart(productId: number): void {
     let cart = this.getCart();
@@ -68,5 +68,5 @@ addToCart(product: any, quantity: number = 1): void {
 
     this.saveCart(cart);
   }
-  
+
 }

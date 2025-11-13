@@ -1,18 +1,11 @@
-<app-popup-message 
-  [isVisible]="popupVisible" 
-  [title]="popupTitle" 
-  [message]="popupMessage" 
-  [isError]="popupIsError"
-  [confirmMode]="popupConfirmMode" 
-  (close)="closePopup()" 
-  (confirm)="handleConfirm()">
+<app-popup-message [isVisible]="popupVisible" [title]="popupTitle" [message]="popupMessage" [isError]="popupIsError"
+  [confirmMode]="popupConfirmMode" (close)="closePopup()" (confirm)="handleConfirm()">
 </app-popup-message>
 
 <div class="admin-dashboard">
 
   <mat-tab-group mat-align-tabs="center" class="dashboard-tabs">
 
-    <!-- TAB 1: Adaugă produs -->
     <mat-tab>
       <ng-template mat-tab-label>
         <span class="tab-icon">➕</span> Adaugă produs nou
@@ -21,96 +14,94 @@
       <app-product-form></app-product-form>
     </mat-tab>
 
-    <!-- TAB 2: Comenzi -->
     <mat-tab>
       <ng-template mat-tab-label>
         <span class="tab-icon">📦</span> Comenzi
       </ng-template>
 
-     <div *ngIf="orders.length === 0" class="orders-placeholder">
-  <p>Nu există comenzi în sistem.</p>
-</div>
+      <div *ngIf="orders.length === 0" class="orders-placeholder">
+        <p>Nu există comenzi în sistem.</p>
+      </div>
 
-<table *ngIf="orders.length > 0" class="orders-table">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Client</th>
-      <th>Email</th>
-      <th>Produse</th>
-      <th>Total</th>
-      <th>Status</th>
-      <th>Data</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let order of orders">
-      <td>#{{order.id}}</td>
-      <td>{{order.user.firstName}} {{order.user.lastName}}</td>
-<td>{{order.user.email}}</td>
-<td>
-  <div *ngFor="let item of order.items">
-    {{item.product.name}} x{{item.quantity}}
-  </div>
-</td>
-      <td>{{order.total | number:'1.2-2'}} lei</td>
-      <td>{{order.status}}</td>
-      <td>{{order.createdAt | date:'dd MMM yyyy, HH:mm'}}</td>
-    </tr>
-  </tbody>
-</table>
+      <table *ngIf="orders.length > 0" class="orders-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Client</th>
+            <th>Email</th>
+            <th>Produse</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders">
+            <td>#{{order.id}}</td>
+            <td>{{order.user.firstName}} {{order.user.lastName}}</td>
+            <td>{{order.user.email}}</td>
+            <td>
+              <div *ngFor="let item of order.items">
+                {{item.product.name}} x{{item.quantity}}
+              </div>
+            </td>
+            <td>{{order.total | number:'1.2-2'}} lei</td>
+            <td>{{order.status}}</td>
+            <td>{{order.createdAt | date:'dd MMM yyyy, HH:mm'}}</td>
+          </tr>
+        </tbody>
+      </table>
     </mat-tab>
 
-    <!-- TAB 3: Utilizatori -->
     <mat-tab>
-  <ng-template mat-tab-label>
-    <span class="tab-icon">👥</span> Utilizatori
-  </ng-template>
+      <ng-template mat-tab-label>
+        <span class="tab-icon">👥</span> Utilizatori
+      </ng-template>
 
-  <div class="tab-content-container">
+      <div class="tab-content-container">
 
-    <div class="user-search">
-      <input type="text" placeholder="Caută utilizator..." [(ngModel)]="searchUserName" (input)="filterUsers()">
-    </div>
+        <div class="user-search">
+          <input type="text" placeholder="Caută utilizator..." [(ngModel)]="searchUserName" (input)="filterUsers()">
+        </div>
 
-    <table class="users-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nume utilizator</th>
-          <th>Email</th>
-          <th>Telefon</th>
-          <th>Creat la</th>
-          <th>Acțiuni</th>
-        </tr>
-      </thead>
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nume utilizator</th>
+              <th>Email</th>
+              <th>Telefon</th>
+              <th>Creat la</th>
+              <th>Acțiuni</th>
+            </tr>
+          </thead>
 
-      <tbody>
-        <tr *ngFor="let user of paginatedUsers">
-          <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.phoneNumber || '-' }}</td>
-          <td>{{ user.createdAt | date:'mediumDate' }}</td>
+          <tbody>
+            <tr *ngFor="let user of paginatedUsers">
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.phoneNumber || '-' }}</td>
+              <td>{{ user.createdAt | date:'mediumDate' }}</td>
 
-          <td class="action-buttons">       
-            <button class="btn-delete" (click)="confirmDeleteUser(user.id)">
-              🗑️ Șterge
-            </button>
+              <td class="action-buttons">
+                <button class="btn-delete" (click)="confirmDeleteUser(user.id)">
+                  🗑️ Șterge
+                </button>
 
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-    <div class="pagination-controls" *ngIf="totalUserPages > 1">
-      <button (click)="previousUserPage()" [disabled]="currentUserPage === 1">‹</button>
-      <span>Pagina {{ currentUserPage }} din {{ totalUserPages }}</span>
-      <button (click)="nextUserPage()" [disabled]="currentUserPage === totalUserPages">›</button>
-    </div>
+        <div class="pagination-controls" *ngIf="totalUserPages > 1">
+          <button (click)="previousUserPage()" [disabled]="currentUserPage === 1">‹</button>
+          <span>Pagina {{ currentUserPage }} din {{ totalUserPages }}</span>
+          <button (click)="nextUserPage()" [disabled]="currentUserPage === totalUserPages">›</button>
+        </div>
 
-  </div>
-</mat-tab>
+      </div>
+    </mat-tab>
 
   </mat-tab-group>
 </div>

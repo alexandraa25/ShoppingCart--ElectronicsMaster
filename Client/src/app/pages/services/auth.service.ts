@@ -5,10 +5,10 @@ import { LoginResponseModel } from '../models/login-response.model';
 import { UserDetailsModel } from '../models/user-details.model';
 
 @Injectable({
-  providedIn: 'root', // Configurare pentru injectare globală
+  providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000'; // Înlocuiește cu URL-ul backend-ului
+  private apiUrl = 'http://localhost:3000'; 
   private currentUserSubject = new BehaviorSubject<any>(null);
   public user$ = this.currentUserSubject.asObservable();
 
@@ -22,7 +22,7 @@ export class AuthService {
 
 
   register(formData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, formData); // Cerere POST către backend
+    return this.http.post<any>(`${this.apiUrl}/register`, formData); 
   }
 
   confirmMail(token: string) {
@@ -95,18 +95,13 @@ export class AuthService {
   }
   setUser(user: any) {
     this.currentUserSubject.next(user);
-    localStorage.setItem("user", JSON.stringify(user)); // ✅ păstrăm și după refresh
+    localStorage.setItem("user", JSON.stringify(user)); 
   }
 
   getAllUsers(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/users`);
   }
-  // Suspendă utilizator
-  suspendUser(id: number) {
-    return this.http.put(`${this.apiUrl}/users/${id}/suspend`, {});
-  }
-
-  // Șterge utilizator (mutare în DeletedUser)
+ 
   deleteUser(id: number) {
     return this.http.delete(`${this.apiUrl}/users/${id}`);
   }
