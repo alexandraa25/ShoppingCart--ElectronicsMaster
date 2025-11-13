@@ -58,13 +58,6 @@ export class OrderCheckoutComponent implements OnInit {
 
 
 placeOrder() {
-  let token = localStorage.getItem('accessToken');
-
-  if (!token) {
-    this.router.navigate(['/login']);
-    return;
-  }
-
   const order = {
     items: this.cart.map(i => ({
       productId: i.id,
@@ -75,7 +68,7 @@ placeOrder() {
     ...this.checkoutForm.value
   };
 
-  this.orderService.createOrder(order, token).subscribe({
+  this.orderService.createOrder(order).subscribe({
     next: () => {
       this.cartService.clearCart();
       this.router.navigate(['/profil-user']);
@@ -83,25 +76,28 @@ placeOrder() {
     },
     error: (err) => {
 
-      // 💡 Dacă token-ul este expirat → reîmprospătăm automat
+      // Dacă token expirat → încercăm refresh
       if (err.status === 401) {
 
         this.auth.refresh().subscribe({
           next: (res) => {
-            const newToken = res.accessToken;
 
-            // retrimitem comanda cu token nou
-            this.orderService.createOrder(order, newToken).subscribe({
+            // salvăm token-ul nou
+            localStorage.setItem("accessToken", res.accessToken);
+
+            // retrimitem comanda
+            this.orderService.createOrder(order).subscribe({
               next: () => {
                 this.cartService.clearCart();
                 this.router.navigate(['/profil-user']);
-                alert("✅ Comanda ta a fost plasată!");
+                alert("✅ Comanda ta a fost plasată după reîmprospătarea token-ului!");
               },
               error: () => alert("❌ Eroare chiar și după refresh.")
             });
           },
+
           error: () => {
-            alert("⚠️ Sesiunea a expirat. Te rugăm să te autentifici.");
+            alert("⚠️ Sesiunea a expirat. Te rugăm să te autentifici din nou.");
             this.router.navigate(['/login']);
           }
         });

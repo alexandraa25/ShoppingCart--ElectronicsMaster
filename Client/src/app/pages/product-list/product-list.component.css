@@ -58,7 +58,7 @@
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* exact 4 coloane */
+  grid-template-columns: repeat(3, 1fr); /* exact 4 coloane */
   gap: 1.5rem;
 }
 @media (max-width: 1200px) {

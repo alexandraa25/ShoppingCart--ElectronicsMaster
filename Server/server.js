@@ -148,7 +148,7 @@ app.get("/roles", async (req, res) => {
   res.json(roles);
 });
 
-// ======================== GET ALL USERS ========================
+// ======================== USERS ========================
 app.get("/users", async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -158,7 +158,7 @@ app.get("/users", async (req, res) => {
         email: true,
         phoneNumber: true,
         role: {
-          select: { name: true } // rolul (ex: admin, user)
+          select: { name: true } 
         }
       }
     });
@@ -174,50 +174,111 @@ app.delete("/users/:id", async (req, res) => {
   const userId = Number(req.params.id);
 
   try {
-    await prisma.user.delete({
-      where: { id: userId }
+    await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({ where: { id: userId } });
+      if (!user) return res.status(404).json({ error: "Utilizatorul nu există." });
+
+      await tx.deletedUser.create({
+        data: {
+          originalId: user.id,
+          name: user.name,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          address: user.address,
+          phoneNumber: user.phoneNumber,
+        }
+      });
+
+      await tx.order.updateMany({
+        where: { userId: user.id },
+        data: { userId: null } 
+      });
+
+      await tx.user.delete({ where: { id: user.id } });
     });
 
-    res.json({ success: true, message: "Utilizator șters definitiv." });
-
+    res.json({ success: true, message: "Utilizatorul a fost arhivat și șters din sistem." });
   } catch (err) {
-    console.error(err);
+    console.error("❌ EROARE DELETE USER:", err);
     res.status(500).json({ error: "Eroare la ștergerea utilizatorului." });
   }
 });
 
-app.put("/users/:id/suspend", async (req, res) => {
-  const userId = Number(req.params.id);
+app.get("/check-user-existence", async (req, res) => {
+  const { email, phoneNumber } = req.query;
 
   try {
-    const user = await prisma.user.update({
-      where: { id: userId },
-      data: { status: "SUSPENDED" }
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: email },
+          { phoneNumber: phoneNumber }
+        ]
+      }
     });
 
-    res.json({ success: true, user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Eroare la suspendarea utilizatorului." });
-  }
-});
-app.put("/users/:id/activate", async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
+    if (user) {
+      return res.json({ exists: true });
+    }
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: { status: "ACTIVE" }
-    });
+    return res.json({ exists: false });
 
-    res.json({ success: true });
   } catch (error) {
-    console.error("EROARE ACTIVARE USER:", error);
-    res.status(500).json({ error: "Eroare la activarea utilizatorului." });
+    console.error("EROARE EXISTENȚĂ USER:", error);
+    res.status(500).json({ error: "Eroare la verificarea utilizatorului." });
   }
 });
 
-// ======================== CATEGORY CRUD ========================
+app.get("/get-user-details", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: "Missing Authorization header" });
+
+    const token = authHeader.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Token missing" });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        address: true,
+        role: { select: { name: true } }
+      }
+    });
+
+    return res.json(user);
+
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+app.put("/update-user", async (req, res) => {
+  const { id, firstName, lastName, name, email, phoneNumber, address } = req.body;
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { firstName, lastName, name, email, phoneNumber, address }
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Eroare la actualizare profil." });
+  }
+});
+
+// ======================== CATEGORY ========================
 app.get("/categories", async (req, res) => {
   const categories = await prisma.category.findMany();
   res.json(categories);
@@ -233,7 +294,7 @@ app.post("/categories", async (req, res) => {
   }
 });
 
-// ======================== PRODUCT CRUD ========================
+// ======================== PRODUCT ========================
 
 app.get("/products", async (req, res) => {
   try {
@@ -394,7 +455,6 @@ app.delete("/products/:id", async (req, res) => {
         return res.status(404).json({ error: "Produsul nu există." });
       }
 
-      // 1) Mutăm produsul în tabela DeletedProduct
       const deleted = await tx.deletedProduct.create({
         data: {
           name: product.name,
@@ -410,7 +470,6 @@ app.delete("/products/:id", async (req, res) => {
         }
       });
 
-      // 2) Ștergem doar înregistrările din produsele active
       await tx.productImage.deleteMany({ where: { productId } });
       await tx.product.delete({ where: { id: productId } });
 
@@ -424,32 +483,8 @@ app.delete("/products/:id", async (req, res) => {
   }
 });
 
-app.get("/check-user-existence", async (req, res) => {
-  const { email, phoneNumber } = req.query;
 
-  try {
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: email },
-          { phoneNumber: phoneNumber }
-        ]
-      }
-    });
-
-    if (user) {
-      return res.json({ exists: true });
-    }
-
-    return res.json({ exists: false });
-
-  } catch (error) {
-    console.error("EROARE EXISTENȚĂ USER:", error);
-    res.status(500).json({ error: "Eroare la verificarea utilizatorului." });
-  }
-});
-
-// ======================== COS ========================
+// ======================== CART ========================
 app.use(cors({
   origin: "http://localhost:4200",
   credentials: true
@@ -476,13 +511,12 @@ function recalc(cart) {
   cart.totalQty = cart.items.reduce((s, it) => s + it.qty, 0);
   cart.total = cart.items.reduce((s, it) => s + it.qty * it.price, 0);
 }
-// GET /cart – vezi coșul din sesiune
+
 app.get("/cart", (req, res) => {
   const cart = getCart(req);
   res.json(cart);
 });
 
-// POST /cart/add  { productId, qty }
 app.post("/cart/add", async (req, res) => {
   try {
     const { productId, qty = 1 } = req.body;
@@ -502,7 +536,6 @@ app.post("/cart/add", async (req, res) => {
     const existing = cart.items.find(i => i.productId === id);
 
     if (existing) {
-      // poți limita la stoc
       if (existing.qty + count > product.stock)
         return res.status(400).json({ error: "Depășește stocul." });
       existing.qty += count;
@@ -524,7 +557,6 @@ app.post("/cart/add", async (req, res) => {
   }
 });
 
-// PATCH /cart/update  { productId, qty }
 app.patch("/cart/update", async (req, res) => {
   try {
     const { productId, qty } = req.body;
@@ -540,7 +572,6 @@ app.patch("/cart/update", async (req, res) => {
     if (count === 0) {
       cart.items = cart.items.filter(i => i.productId !== id);
     } else {
-      // verifică stoc actual
       const product = await prisma.product.findUnique({ where: { id } });
       if (!product) return res.status(404).json({ error: "Produsul nu există." });
       if (count > product.stock) return res.status(400).json({ error: "Depășește stocul." });
@@ -555,7 +586,6 @@ app.patch("/cart/update", async (req, res) => {
   }
 });
 
-// DELETE /cart/item/:productId
 app.delete("/cart/item/:productId", (req, res) => {
   const id = Number(req.params.productId);
   const cart = getCart(req);
@@ -564,62 +594,11 @@ app.delete("/cart/item/:productId", (req, res) => {
   res.json(cart);
 });
 
-// DELETE /cart – golește coșul
 app.delete("/cart", (req, res) => {
   req.session.cart = { items: [], totalQty: 0, total: 0 };
   res.json(req.session.cart);
 });
 
-app.get("/get-user-details", async (req, res) => {
-  try {
-    // 1) Luăm tokenul din header
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: "Missing Authorization header" });
-
-    const token = authHeader.split(" ")[1];
-    if (!token) return res.status(401).json({ error: "Token missing" });
-
-    // 2) Decodăm tokenul
-    const decoded = jwt.verify(token, JWT_SECRET);
-
-    // 3) Luăm userul complet
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        name: true,
-        email: true,
-        phoneNumber: true,
-        address: true,
-        role: { select: { name: true } }
-      }
-    });
-
-    return res.json(user);
-
-  } catch (error) {
-    console.log(error);
-    return res.status(401).json({ error: "Invalid token" });
-  }
-});
-
-app.put("/update-user", async (req, res) => {
-  const { id, firstName, lastName, name, email, phoneNumber, address } = req.body;
-
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { id: Number(id) },
-      data: { firstName, lastName, name, email, phoneNumber, address }
-    });
-
-    res.json(updatedUser);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Eroare la actualizare profil." });
-  }
-});
 
 app.post("/create-order", authMiddleware, async (req, res) => {
   try {
@@ -657,6 +636,65 @@ app.post("/create-order", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("❌ Eroare la create-order:", error);
     return res.status(500).json({ error: "Eroare la creare comandă." });
+  }
+});
+
+// ======================== ORDERS ========================
+app.get("/orders", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: "Missing token" });
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const orders = await prisma.order.findMany({
+      where: { userId: decoded.id },
+      include: {
+        items: {
+          include: {
+            product: { select: { name: true, price: true } }
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    res.json(orders);
+  } catch (e) {
+    console.log("ERROR ORDERS:", e);
+    res.status(500).json({ error: "Eroare la obținerea comenzilor." });
+  }
+});
+
+app.get("/admin/orders", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      include: { role: true }
+    });
+
+    if (user.role.name.toLowerCase() !== "admin") {
+      return res.status(403).json({ error: "Acces interzis" });
+    }
+
+    const orders = await prisma.order.findMany({
+      include: {
+        user: true,
+        items: { include: { product: true } }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    res.json(orders);
+
+  } catch (e) {
+    console.error("❌ ADMIN ORDERS ERROR:", e);
+    res.status(500).json({ error: "Eroare la încărcare." });
   }
 });
 

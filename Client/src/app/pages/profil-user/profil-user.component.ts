@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { OrderService } from '../services/order.service';
 
 @Component({
   selector: 'app-profil-user',
@@ -16,11 +17,14 @@ export class ProfilUserComponent {
   user: any;
   editMode = false;
   profileForm!: FormGroup;
+  orders: any[] = [];
+  
 
   constructor(
     private auth: AuthService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private orderService: OrderService,
   ) { }
 
   ngOnInit() {
@@ -52,6 +56,7 @@ export class ProfilUserComponent {
         this.router.navigate(['/login']);
       }
     });
+     this.loadOrders();
   }
 
   enableEdit() {
@@ -71,5 +76,14 @@ export class ProfilUserComponent {
       error: () => alert("Eroare la salvare!")
     });
   }
-
+loadOrders() {
+  this.orderService.getUserOrders().subscribe({
+    next: (data: any) => {
+      this.orders = data;
+    },
+    error: () => {
+      this.orders = [];
+    }
+  });
+}
 }

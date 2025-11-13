@@ -76,22 +76,20 @@ model DeletedProductImage {
 }
 
 model Order {
-  id              Int         @id @default(autoincrement())
-  userId          Int
-  user            User        @relation(fields: [userId], references: [id])
-
-  total           Float
-  status          String       @default("PENDING")
-
-  billingName     String?
-  billingAddress  String?
+  id             Int       @id @default(autoincrement())
+  userId         Int?      // devine opțional
+  user           User?     @relation(fields: [userId], references: [id])
+  total          Float
+  status         String
+  billingName    String?
+  billingAddress String?
   deliveryAddress String?
-  contactName     String?
-  contactPhone    String?
-
-  items           OrderItem[]
-  createdAt       DateTime     @default(now())
+  contactName    String?
+  contactPhone   String?
+  items          OrderItem[]
+  createdAt      DateTime  @default(now())
 }
+
 model OrderItem {
   id      Int   @id @default(autoincrement())
   orderId Int
@@ -110,4 +108,16 @@ enum OrderStatus {
   SHIPPED // expediată
   COMPLETED // livrată
   CANCELLED // anulată
+}
+
+model DeletedUser {
+  id           Int       @id @default(autoincrement())
+  originalId   Int
+  name         String?
+  email        String?
+  firstName    String?
+  lastName     String?
+  address      String?
+  phoneNumber  String?
+  deletedAt    DateTime  @default(now())
 }

@@ -176,3 +176,25 @@
   color: #facc15;
   font-weight: 600;
 }
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: #1e293b;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.orders-table th, .orders-table td {
+  padding: 10px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+.orders-table th {
+  background: #24324d;
+  font-weight: bold;
+  color: #facc15;
+}
+

@@ -27,9 +27,38 @@
         <span class="tab-icon">📦</span> Comenzi
       </ng-template>
 
-      <div class="orders-placeholder">
-        <p>📦 Modulul de comenzi va fi adăugat în curând.</p>
-      </div>
+     <div *ngIf="orders.length === 0" class="orders-placeholder">
+  <p>Nu există comenzi în sistem.</p>
+</div>
+
+<table *ngIf="orders.length > 0" class="orders-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Client</th>
+      <th>Email</th>
+      <th>Produse</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Data</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let order of orders">
+      <td>#{{order.id}}</td>
+      <td>{{order.user.firstName}} {{order.user.lastName}}</td>
+<td>{{order.user.email}}</td>
+<td>
+  <div *ngFor="let item of order.items">
+    {{item.product.name}} x{{item.quantity}}
+  </div>
+</td>
+      <td>{{order.total | number:'1.2-2'}} lei</td>
+      <td>{{order.status}}</td>
+      <td>{{order.createdAt | date:'dd MMM yyyy, HH:mm'}}</td>
+    </tr>
+  </tbody>
+</table>
     </mat-tab>
 
     <!-- TAB 3: Utilizatori -->
@@ -64,16 +93,7 @@
           <td>{{ user.phoneNumber || '-' }}</td>
           <td>{{ user.createdAt | date:'mediumDate' }}</td>
 
-          <td class="action-buttons">
-
-            <button class="btn-suspend" *ngIf="user.status !== 'SUSPENDED'" (click)="confirmSuspendUser(user.id)">
-              ⛔ Suspend
-            </button>
-
-            <button class="btn-activate" *ngIf="user.status === 'SUSPENDED'" (click)="confirmActivateUser(user.id)">
-              ✅ Activează
-            </button>
-
+          <td class="action-buttons">       
             <button class="btn-delete" (click)="confirmDeleteUser(user.id)">
               🗑️ Șterge
             </button>

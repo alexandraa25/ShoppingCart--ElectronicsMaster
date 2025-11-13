@@ -5,6 +5,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
 import { AuthService } from '../services/auth.service';
 import { PopupMessageComponent } from '../popup-message/popup-message.component';
 import { FormsModule } from '@angular/forms';
+import { OrderService } from '../services/order.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -18,6 +19,7 @@ export class AdminDashboardComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
   paginatedUsers: any[] = [];
+  orders: any[] = [];
 
   searchUserName: string = "";
   itemsPerPage = 10;
@@ -29,13 +31,14 @@ export class AdminDashboardComponent implements OnInit {
   popupIsError = false;
   popupConfirmMode = false;
 
- userAction: 'delete' | 'suspend' | 'activate' | null = null;
+  // doar delete
   userTargetId: number | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private orderService: OrderService) {}
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadOrders();
   }
 
   loadUsers(): void {
@@ -75,59 +78,24 @@ export class AdminDashboardComponent implements OnInit {
     this.paginateUsers();
   }
 
-  // ✅ Open popup to suspend
-  confirmSuspendUser(id: number): void {
-    this.popupTitle = "Suspendare Utilizator";
-    this.popupMessage = "Sigur vrei să suspendezi acest utilizator?";
-    this.popupConfirmMode = true;
-    this.userAction = "suspend";
-    this.userTargetId = id;
-    this.popupVisible = true;
-  }
-
-  // ✅ Open popup to delete
+  // ✅ Confirm delete popup
   confirmDeleteUser(id: number): void {
     this.popupTitle = "Ștergere Utilizator";
     this.popupMessage = "Ești sigur că vrei să ștergi definitiv acest utilizator?";
     this.popupConfirmMode = true;
-    this.userAction = "delete";
     this.userTargetId = id;
     this.popupVisible = true;
   }
-  confirmActivateUser(id: number): void {
-  this.popupTitle = "Activare Utilizator";
-  this.popupMessage = "Ești sigur că vrei să reactivezi acest utilizator?";
-  this.popupConfirmMode = true;
-  this.userAction = "activate";
-  this.userTargetId = id;
-  this.popupVisible = true;
-}
 
-  // ✅ Executes suspend/delete after confirm
-handleConfirm(): void {
-  if (!this.userTargetId || !this.userAction) return;
+  // ✅ Execute delete
+  handleConfirm(): void {
+    if (!this.userTargetId) return;
 
-  if (this.userAction === "suspend") {
-    this.authService.suspendUser(this.userTargetId).subscribe(() => {
-      this.showPopup("Succes", "Utilizator suspendat.");
-      this.loadUsers();
-    });
-  }
-
-  if (this.userAction === "delete") {
     this.authService.deleteUser(this.userTargetId).subscribe(() => {
       this.showPopup("Succes", "Utilizator șters.");
       this.loadUsers();
     });
   }
-
-  if (this.userAction === "activate") {
-    this.authService.activateUser(this.userTargetId).subscribe(() => {
-      this.showPopup("Succes", "Utilizator reactivat.");
-      this.loadUsers();
-    });
-  }
-}
 
   showPopup(title: string, message: string, isError: boolean = false): void {
     this.popupTitle = title;
@@ -140,4 +108,10 @@ handleConfirm(): void {
   closePopup(): void {
     this.popupVisible = false;
   }
+
+ loadOrders() { 
+  console.log("📌 TOKEN:", localStorage.getItem("accessToken")); 
+  this.orderService.getAllOrders().subscribe({ 
+    next: (data: any[]) => { console.log("✅ Comenzi primite:", data); this.orders = data; }, 
+    error: (err) => { console.log("❌ Eroare la încărcare:", err); } }); }
 }

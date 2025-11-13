@@ -1,70 +1,73 @@
 .navbar {
-  background-color: #2a3a5e; /* dark blue-gray */
-  padding: 1rem 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  font-family: 'Segoe UI', sans-serif;
+  /* position: fixed;   */
+  top: 0;
+  left: 0;
+  width: 100%;             
+  background: #1b2741;
+  padding: 0.7rem 0;           
+  z-index: 10000;           
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-}
-
-.logo-img {
-  height: 80px;
-  margin-top: -30px;
-  margin-bottom: -30px;
-  margin-left: -90px;
+  align-items: center;
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
+  align-items: center;
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
 .nav-links a {
-  color: #facc15; /* galben deschis */
-  font-weight: 500;
+  color: #facc15;
+  font-weight: 600;
   text-decoration: none;
   font-size: 1rem;
-  transition: color 0.3s ease;
-  padding: 6px 12px;
-  border-radius: 4px;
+  transition: 0.3s ease;
 }
 
 .nav-links a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: white;
+  text-shadow: 0 0 6px #facc15;
 }
 
+body {
+  margin: 0;              
+  padding-top: 90px;        
+}
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .cart-link {
-  position: relative;
   color: white;
-  text-decoration: none;
+  font-weight: 500;
+  position: relative;
 }
 
 .cart-badge {
-  background: red;
+  background: #dc2626;
   border-radius: 50%;
   padding: 3px 7px;
   font-size: 12px;
   position: absolute;
   top: -8px;
-  right: -10px;
+  right: -12px;
+  color: white;
 }
 
 .user-greeting {
+  color: #ffffff;
   font-weight: 600;
+  opacity: 0.9;
 }
