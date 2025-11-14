@@ -21,7 +21,7 @@ export class AdminDashboardComponent implements OnInit {
   paginatedUsers: any[] = [];
   orders: any[] = [];
 
-  searchUserName: string = "";
+  searchUserName = "";
   itemsPerPage = 10;
   currentUserPage = 1;
 
@@ -31,7 +31,6 @@ export class AdminDashboardComponent implements OnInit {
   popupIsError = false;
   popupConfirmMode = false;
 
- 
   userTargetId: number | null = null;
 
   constructor(private authService: AuthService, private orderService: OrderService) {}
@@ -47,8 +46,7 @@ export class AdminDashboardComponent implements OnInit {
         this.users = data;
         this.filteredUsers = [...data];
         this.paginateUsers();
-      },
-      error: () => this.showPopup("Eroare", "Nu am putut încărca utilizatorii.", true)
+      }
     });
   }
 
@@ -79,8 +77,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   confirmDeleteUser(id: number): void {
-    this.popupTitle = "Ștergere Utilizator";
-    this.popupMessage = "Ești sigur că vrei să ștergi definitiv acest utilizator?";
+    this.popupTitle = "Ștergere utilizator";
+    this.popupMessage = "Ești sigur că vrei să ștergi acest utilizator?";
     this.popupConfirmMode = true;
     this.userTargetId = id;
     this.popupVisible = true;
@@ -107,9 +105,14 @@ export class AdminDashboardComponent implements OnInit {
     this.popupVisible = false;
   }
 
- loadOrders() { 
-  console.log("📌 TOKEN:", localStorage.getItem("accessToken")); 
-  this.orderService.getAllOrders().subscribe({ 
-    next: (data: any[]) => { console.log("✅ Comenzi primite:", data); this.orders = data; }, 
-    error: (err) => { console.log("❌ Eroare la încărcare:", err); } }); }
+  loadOrders() {
+    this.orderService.getAllOrders().subscribe({
+      next: (data: any[]) => {
+        this.orders = data;
+      },
+      error: (err) => {
+        console.log("❌ Eroare la încărcare comenzi:", err);
+      }
+    });
+  }
 }
